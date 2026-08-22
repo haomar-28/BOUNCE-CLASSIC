@@ -252,8 +252,16 @@ int main(){
     Texture2D ringbacktexture = LoadTexture("assets/ring back.png");
     Texture2D ringfronttexture = LoadTexture("assets/ring front.png");
 
+    Texture2D ringbackbwtexture = LoadTexture("assets/ring back b&w.png");
+    Texture2D ringfrontbwtexture = LoadTexture("assets/ring front b&w.png");
+
     //to load sound of bouncing 
     Sound bounce = LoadSound("assets/bouncesound.mp3");
+
+    bool checkringcolor =0;
+
+    //loading sound of ring passing
+    Sound ringpasssound= LoadSound("assets/ring pass.mp3");
 
                     /*  EXPLOSION */
 
@@ -283,8 +291,12 @@ int main(){
 
         //for the speed of the ball when the collision happened once
         if(!respawn){
+        Vector2 prevposition = position;
         speed = Vector2Add(speed, Vector2Scale(gravity,dt));
         position = Vector2Add(position, Vector2Scale(speed,dt));
+
+        //for rings color change
+        if (position.x < prevposition.x && position.x <= ringbackposition.x && position.y<(12*blocksize) && position.y > (10* blocksize)) checkringcolor =1;
         }
 
         //for checking if the ball is on the platform or not
@@ -370,12 +382,16 @@ int main(){
         explosionrec.x= explosionwidth * currentframe;
         explosionrec.y= explosionheight * currentline;
 
+        //for rings sound
+        if(checkringcolor == 0) PlaySound(ringpasssound);
+
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
         //to draw the blocks (level 1)
         drawlevel();
 
+        if(!checkringcolor){
         //drawing front ring first
         DrawTextureEx(
         ringfronttexture,
@@ -396,6 +412,30 @@ int main(){
             0.0f,
             ringsize,
             WHITE);
+        }
+
+        else {
+        //drawing front ring first
+        DrawTextureEx(
+        ringfrontbwtexture,
+        (Vector2){
+            ringfrontposition.x - ringfronttexture.width * ringsize / 2, ringfrontposition.y - ringfronttexture.height * ringsize / 2},
+            0.0f,
+            ringsize,
+            WHITE);
+
+        //draw ball
+        DrawCircleV(position, radius, RED);
+        
+        //after ball, drawing back ring
+        DrawTextureEx(
+        ringbackbwtexture,
+        (Vector2){
+            ringbackposition.x - ringbacktexture.width * ringsize / 2, ringbackposition.y - ringbacktexture.height * ringsize / 2},
+            0.0f,
+            ringsize,
+            WHITE);
+        }
 
         //draw enemy1
         DrawTextureEx(enemy1, enemy1position,0.0f, enemy1size/enemy1.width, WHITE );
@@ -413,6 +453,9 @@ int main(){
     UnloadTexture(enemy1);
     UnloadTexture(ringfronttexture);
     UnloadTexture(ringbacktexture);
+    UnloadTexture(ringbackbwtexture);
+    UnloadTexture(ringfrontbwtexture);
+    UnloadSound(ringpasssound);
     CloseWindow();
     return 0;
 
