@@ -288,6 +288,15 @@ int main(){
     float respawntimer = 0.0f;
     bool respawn = false;
 
+                    /*  GEM   */
+    Vector2 gemposition = {17*blocksize, 10* blocksize};
+    Texture2D gem= LoadTexture("assets/gem.png");
+    int gempass = 0;
+    int gemcount= 0;
+    Sound gemsound = LoadSound("assets/gemsound.mp3");
+    float gemsize = 0.05f;
+
+
     while(!WindowShouldClose()){
         float dt = GetFrameTime();
 
@@ -297,12 +306,24 @@ int main(){
         speed = Vector2Add(speed, Vector2Scale(gravity,dt));
         position = Vector2Add(position, Vector2Scale(speed,dt));
 
+        //for the ball passing the ring
         if (!checkringcolor && prevposition.x > ringbackposition.x && position.x <= ringbackposition.x && position.y > 10 * blocksize && position.y < 12 * blocksize)
-{
-    checkringcolor = true;
-    ringcount++;
-    PlaySound(ringpasssound);
-}
+    {
+        checkringcolor = true;
+        ringcount++;
+        PlaySound(ringpasssound);
+    }
+
+        //for the ball passing the gem
+        if (!gempass &&
+            ((prevposition.x < gemposition.x && position.x >= gemposition.x) || (prevposition.x > gemposition.x && position.x <= gemposition.x)) && position.y + radius > gemposition.y &&  position.y - radius < gemposition.y + gem.height * gemsize)
+        {
+            gempass = 1;
+            gemcount++;
+            PlaySound(gemsound);
+        }
+
+
     }
 
         //for checking if the ball is on the platform or not
@@ -354,8 +375,7 @@ int main(){
             explosionposition.y = position.y- explosionheight/ 2.0f;
 
             respawn = true;
-            respawntimer= 0.3f;
-            
+            respawntimer= 0.3f;    
 
         }
 
@@ -391,10 +411,18 @@ int main(){
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
+        //draw gem
+        if(!gempass){
+            DrawTextureEx(gem, gemposition, 0.0f, gemsize, WHITE);
+        }
+
         //draw ring point
         DrawText(TextFormat("%d", ringcount), 3*blocksize, blocksize, 30, WHITE);
         DrawTextureEx(ringfulltexture, (Vector2){2*blocksize+10, blocksize-8}, 0.0f, ringsize/2.5, WHITE);
 
+        //draw gem point
+        DrawText(TextFormat("%d", gemcount), 5*blocksize, blocksize, 30, WHITE);
+        DrawTextureEx(gem, (Vector2){4*blocksize+10, blocksize}, 0.0f, gemsize, WHITE);
 
         //to draw the blocks (level 1)
         drawlevel();
