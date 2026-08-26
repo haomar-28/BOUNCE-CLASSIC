@@ -270,7 +270,7 @@ int main(){
     //for generating explosion after collision with enemy1
     Texture2D explosiontext= LoadTexture("assets/explosion.png");
 
-    //for explosion effect
+    //for explosion effects
     float explosionwidth = (float) explosiontext.width/5;
     float explosionheight = (float) explosiontext.height;
     int currentframe = 0;
