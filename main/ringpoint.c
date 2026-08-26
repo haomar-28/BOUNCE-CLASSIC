@@ -247,9 +247,12 @@ int main(){
     float ringsize = 0.4f;
     float ringradius= 25;
 
+    int ringcount =0;
+
     //loading rings textures of front and back
     Texture2D ringbacktexture = LoadTexture("assets/ring back.png");
     Texture2D ringfronttexture = LoadTexture("assets/ring front.png");
+    Texture2D ringfulltexture = LoadTexture("assets/ring full.png");
 
     Texture2D ringbackbwtexture = LoadTexture("assets/ring back b&w.png");
     Texture2D ringfrontbwtexture = LoadTexture("assets/ring front b&w.png");
@@ -294,9 +297,13 @@ int main(){
         speed = Vector2Add(speed, Vector2Scale(gravity,dt));
         position = Vector2Add(position, Vector2Scale(speed,dt));
 
-        //for rings color change
-        if (position.x < prevposition.x && position.x <= ringbackposition.x && position.y<(12*blocksize) && position.y > (10* blocksize)) checkringcolor =1;
-        }
+        if (!checkringcolor && prevposition.x > ringbackposition.x && position.x <= ringbackposition.x && position.y > 10 * blocksize && position.y < 12 * blocksize)
+{
+    checkringcolor = true;
+    ringcount++;
+    PlaySound(ringpasssound);
+}
+    }
 
         //for checking if the ball is on the platform or not
          bool onplatform = checkcollision(&position, &speed);
@@ -381,11 +388,13 @@ int main(){
         explosionrec.x= explosionwidth * currentframe;
         explosionrec.y= explosionheight * currentline;
 
-        //for rings sound
-        if(checkringcolor == 0) PlaySound(ringpasssound);
-
         BeginDrawing();
         ClearBackground(SKYBLUE);
+
+        //draw ring point
+        DrawText(TextFormat("%d", ringcount), 3*blocksize, blocksize, 30, WHITE);
+        DrawTextureEx(ringfulltexture, (Vector2){2*blocksize+10, blocksize-8}, 0.0f, ringsize/2.5, WHITE);
+
 
         //to draw the blocks (level 1)
         drawlevel();
