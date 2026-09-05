@@ -299,7 +299,7 @@ int main(){
 
                      /* Gameover window*/
     int gameover = 0;
-    Texture2D button= LoadTexture("assets/button.png");
+    Texture2D button= LoadTexture("assets/buttonoriginal.png");
     Texture2D hoveredbutton = LoadTexture("assets/restart hovered.png");
 
     float scale = 0.25f;
