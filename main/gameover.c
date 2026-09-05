@@ -12,6 +12,7 @@
 #define Gravity 1200
 
 // creating upper and lower boundaries for ring
+//hdsfds//
     Rectangle ringrecup = {10*blocksize + 43, 10*blocksize+5, 15, 8 };
     Rectangle ringrecdown = {10 * blocksize + 43, 12* blocksize - 6, 15, 12};
 
