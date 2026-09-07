@@ -686,6 +686,8 @@ int main(){
             currentframe = 0;
             framescounter= 0;
 
+            lifecount = 3;
+
             btnstate=0;
         }
     }
