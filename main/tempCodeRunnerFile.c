@@ -1,1 +1,1 @@
-levelpasscount = 1;
+(Vector2){14*blocksize, 13*blocksize}

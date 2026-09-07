@@ -118,6 +118,64 @@ void levelgeneration1(){
     }
 }
 
+
+// level 2
+
+// now the level 2 generating , where we will create left, right, top , bottom wall and random blocks around the screen
+void levelgeneration2()
+{
+    // bottom wall
+    for (int x = 0; x < (screenwidth / blocksize); x++)
+    {
+        addblock(x, 17);
+    }
+
+    // top wall
+    for (int x = 0; x < (screenwidth / blocksize); x++)
+    {
+        addblock(x, 0);
+    }
+
+    // right wall
+    for (int y = 0; y < (screenheight / blocksize); y++)
+    {
+        addblock(23, y);
+    }
+
+    // left wall
+    for (int y = 0; y < (screenheight / blocksize); y++)
+    {
+        addblock(0, y);
+    }
+
+    // start design
+    
+    addhorizontalplatform(0, 3, 5);
+    addhorizontalplatform(1, 9, 19);
+    addhorizontalplatform(20, 12, 4);
+
+    addverticalplatform(13, 7, 2);
+    addverticalplatform(10, 6, 3);
+    addverticalplatform(7, 1, 6);
+    addverticalplatform(16, 1, 4);
+    addverticalplatform(19, 7, 2);
+    addverticalplatform(14, 12, 5);
+    addverticalplatform(18, 15, 3);
+
+    addrevhorizontalplatform(13, 14, 4);
+    addrevhorizontalplatform(6, 6, 4);
+    
+    //rectangle blocks
+    for (int x = 1; x < 6; x++)
+    {
+        for (int y = 13; y <= 17; y++)
+        {
+           addblock(x, y);
+        }
+    }
+}
+
+
 //draw blocks
 void drawlevel(){
     for (int i=0;i<blockcount; i++){
@@ -218,38 +276,89 @@ int main(){
 
     SetTargetFPS(60);
 
+    Vector2 position;
+    Vector2 speed;
+    Vector2 gravity;
+
+    Vector2 enemy1position;
+    Vector2 enemy1speed;
+    float enemy1size;
+    int enemycol;
+
+    Vector2 ringbackposition;
+    Vector2 ringfrontposition;
+    float ringsize;
+    float ringradius;
+    int ringcount;
+
+    Vector2 gemposition;
+    int gempass;
+    int gemcount;
+    float gemsize ;
+
+
+    int levelcount =1;
+                    
+                       /* ====================== FOR LEVEL 1, SET POSITIONS OF EVERYTHING ================= */
+    
+    if(levelcount ==1){
     //to generate blocks of level 1
     levelgeneration1();
+    
+
+
 
                     /* BALL*/
 
     // for generating the movement of the ball
-    Vector2 position = {radius+blocksize, 500};
-    Vector2 speed= Vector2Zero();
-    Vector2 gravity = {0, Gravity};
+    position = (Vector2){radius+blocksize, 500};
+    speed= Vector2Zero();
+    gravity = (Vector2){0, Gravity};
 
                     /*ENEMY1*/
 
     //for the enemy1
-    Texture2D enemy1 = LoadTexture("assets/enemy1.png");
-    float enemy1size= 80;
+    enemy1size= 80;
     //for enemys rectangle 
-    Vector2 enemy1position= {14*blocksize, 13*blocksize};
-    Vector2 enemy1speed= {0,200};
-    Rectangle enemy1rect= {enemy1position.x, enemy1position.y, enemy1size, enemy1size};
-    int enemycol = 0;
+    enemy1position= (Vector2){14*blocksize, 13*blocksize};
+    enemy1speed= (Vector2){0,200};
+    enemycol = 0;
 
-                    /*  RING  */
+                            /*  RING  */
 
     //defining the position of the ring
-    Vector2 ringbackposition = {11*blocksize,11*blocksize};
-    Vector2 ringfrontposition= {11*blocksize, 11*blocksize};
+    ringbackposition = (Vector2){11*blocksize,11*blocksize};
+    ringfrontposition= (Vector2){11*blocksize, 11*blocksize};
 
     //defining rings structure
-    float ringsize = 0.4f;
-    float ringradius= 25;
+    ringsize = 0.4f;
+    ringradius= 25;
 
-    int ringcount =0;
+    ringcount =0;
+
+                                /*  GEM   */
+
+    gemposition = (Vector2){17*blocksize, 10* blocksize};
+    gempass = 0;
+    gemcount= 0;
+    gemsize = 0.05f;
+
+
+    }
+
+
+    else if(levelcount ==2){
+        levelgeneration2();
+        
+    }
+
+    Texture2D enemy1 = LoadTexture("assets/enemy1.png");
+    Texture2D enemy2 = LoadTexture("assets/enemy1.png");
+    Texture2D enemy3 = LoadTexture("assets/enemy1.png");
+    
+//enemy1 rectangle declaration, useful for collsiion checking
+    Rectangle enemy1rect= {enemy1position.x, enemy1position.y, enemy1size, enemy1size};
+
 
     //loading rings textures of front and back
     Texture2D ringbacktexture = LoadTexture("assets/ring back.png");
@@ -258,6 +367,25 @@ int main(){
 
     Texture2D ringbackbwtexture = LoadTexture("assets/ring back b&w.png");
     Texture2D ringfrontbwtexture = LoadTexture("assets/ring front b&w.png");
+
+    //for second ring
+
+    Texture2D ringback2texture = LoadTexture("assets/ring back.png");
+    Texture2D ringfront2texture = LoadTexture("assets/ring front.png");
+    Texture2D ringfull2texture = LoadTexture("assets/ring full.png");
+
+
+    Texture2D ringbackbw2texture = LoadTexture("assets/ring back b&w.png");
+    Texture2D ringfrontbw2texture = LoadTexture("assets/ring front b&w.png");
+
+    // for 3rd ring
+
+    Texture2D ringback3texture = LoadTexture("assets/ring back.png");
+    Texture2D ringfront3texture = LoadTexture("assets/ring front.png");
+    Texture2D ringfull3texture = LoadTexture("assets/ring full.png");
+
+    Texture2D ringbackbw3texture = LoadTexture("assets/ring back b&w.png");
+    Texture2D ringfrontbw3texture = LoadTexture("assets/ring front b&w.png");
 
     //to load sound of bouncing 
     Sound bounce = LoadSound("assets/bouncesound.mp3");
@@ -290,14 +418,14 @@ int main(){
     float respawntimer = 0.0f;
     bool respawn = false;
 
-                    /*  GEM   */
-    Vector2 gemposition = {17*blocksize, 10* blocksize};
+                        /* GEM load*/
     Texture2D gem= LoadTexture("assets/gem.png");
-    int gempass = 0;
-    int gemcount= 0;
-    Sound gemsound = LoadSound("assets/gemsound.mp3");
-    float gemsize = 0.05f;
 
+    Texture2D gem2= LoadTexture("assets/gem.png");
+
+    Texture2D gem3= LoadTexture("assets/gem.png");
+    Sound gemsound = LoadSound("assets/gemsound.mp3");
+                    
                      /* Gameover window*/
     int gameover = 0;
     Texture2D button= LoadTexture("assets/buttonoriginal.png");
@@ -587,12 +715,28 @@ int main(){
     UnloadSound(explosion);
     UnloadSound(bounce);
     UnloadTexture(enemy1);
+    UnloadTexture(enemy2);
+    UnloadTexture(enemy3);
     UnloadTexture(ringfronttexture);
     UnloadTexture(ringbacktexture);
     UnloadTexture(ringbackbwtexture);
     UnloadTexture(ringfrontbwtexture);
     UnloadTexture(ringfulltexture);
+    UnloadTexture(ringfront2texture);
+    UnloadTexture(ringback2texture);
+    UnloadTexture(ringbackbw2texture);
+    UnloadTexture(ringfrontbw2texture);
+    UnloadTexture(ringfull2texture);
+    UnloadTexture(ringfront3texture);
+    UnloadTexture(ringback3texture);
+    UnloadTexture(ringbackbw3texture);
+    UnloadTexture(ringfrontbw3texture);
+    UnloadTexture(ringfull3texture);
     UnloadSound(ringpasssound);
+
+    UnloadTexture(gem);
+    UnloadTexture(gem2);
+    UnloadTexture(gem3);
     UnloadSound(buttonsound);
     UnloadTexture(hoveredbutton);
     UnloadTexture(button);
