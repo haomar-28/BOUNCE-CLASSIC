@@ -352,7 +352,7 @@ void startLevel(int level)
         ringrecup= ringrecup1;
         ringrecdown= ringrecdown1;
     }
-
+// error
     else if(level == 2)
     {
         levelgeneration2();
