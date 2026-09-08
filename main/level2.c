@@ -526,7 +526,7 @@ int main(){
     flag.height * flagscale
 
 };
-    int jumptext= 0;
+
     Sound levelpass = LoadSound("assets/levelpass.mp3");
     int levelpasscount= 0;
 
