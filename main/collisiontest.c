@@ -1,5 +1,6 @@
 #include"raylib.h"
 #include"raymath.h"
+#include<stdio.h>
 
 
 #define screenwidth 1080
@@ -7,7 +8,7 @@
 #define blocksize 45
 #define maxblocks 300
 #define maxspeedx 300
-#define radius 30
+#define radius 25
 #define jumpspeed 600
 #define Gravity 1200
 
@@ -15,10 +16,8 @@
     Vector2 position2 = {100,blocksize +radius};
     Vector2 position3;
     Vector2 position;
-    
-float ballRotation =0;
+    Vector2 prevposition ;
 
-    
     Vector2 speed;
     Vector2 gravity;
 
@@ -260,73 +259,268 @@ void drawlevel(){
 }
 
 // to change the position and speed after collision
-    bool resolveCircleBlock(Vector2 *position, Vector2 *speed, Rectangle r)
+bool resolveCircleBlock(Vector2 *position,
+                        Vector2 prevPosition,
+                        Vector2 *speed,
+                        Rectangle r)
 {
-    //find closest point of the block to the center of the ball
-    float closestX = Clamp(position->x, r.x, r.x + r.width);
-    float closestY = Clamp(position->y, r.y, r.y + r.height);
+    Vector2 movement = Vector2Subtract(*position, prevPosition);
 
-    Vector2 closestPoint = { closestX, closestY };
-
-    //after subtraction , the direction will be perpendicular to surface
-    Vector2 difference = Vector2Subtract(*position, closestPoint);
-
-    float distance = Vector2Length(difference);
-
-    if (distance > radius || distance == 0.0f)
+    // Ball didn't move
+    if (movement.x == 0.0f && movement.y == 0.0f)
         return false;
 
-    // Normal is a direction only and points away from the block toward the ball.
-    Vector2 normal = Vector2Scale(difference, 1.0f / distance);
 
-    // Move ball outside the block,in the direcction to normal (perpendicular to the previous movement of the ball)
-    position->x = closestPoint.x + normal.x * radius;
-    position->y = closestPoint.y + normal.y * radius;
+    // =====================================================
+    // Find intersection between:
+    // prevPosition -> position
+    //
+    // and the block rectangle
+    // =====================================================
 
-    // Remove only velocity going into the block.
-    float velocityIntoBlock = Vector2DotProduct(*speed, normal);
+    float tmin = 0.0f;
+float tmax = 1.0f;
 
-    if (velocityIntoBlock < 0.0f)
-        *speed = Vector2Subtract(*speed, Vector2Scale(normal, velocityIntoBlock));
-    
-    // True when standing on a surface.
-    return normal.y < -0.5f;
+// Expand the block by the ball radius.
+// Now we are checking the BALL'S CENTER trajectory.
+Rectangle expanded = {
+    r.x - radius,
+    r.y - radius,
+    r.width + 2.0f * radius,
+    r.height + 2.0f * radius
+};
+
+    // -------------------------
+    // X axis
+    // -------------------------
+
+    if (movement.x != 0.0f)
+    {
+        float tx1 = (expanded.x - prevPosition.x) / movement.x;
+        float tx2 = (expanded.x + expanded.width - prevPosition.x) / movement.x;
+
+        if (tx1 > tx2)
+        {
+            float temp = tx1;
+            tx1 = tx2;
+            tx2 = temp;
+        }
+
+        if (tx1 > tmin)
+            tmin = tx1;
+
+        if (tx2 < tmax)
+            tmax = tx2;
+    }
+    else
+    {
+        // Movement is vertical.
+        // Check whether the x coordinate is inside block.
+        if (prevPosition.x < expanded.x ||
+            prevPosition.x > expanded.x + expanded.width)
+        {
+            return false;
+        }
+    }
+
+
+    // -------------------------
+    // Y axis
+    // -------------------------
+
+    if (movement.y != 0.0f)
+    {
+        float ty1 = (expanded.y - prevPosition.y) / movement.y;
+        float ty2 = (expanded.y + expanded.height - prevPosition.y) / movement.y;
+
+        if (ty1 > ty2)
+        {
+            float temp = ty1;
+            ty1 = ty2;
+            ty2 = temp;
+        }
+
+        if (ty1 > tmin)
+            tmin = ty1;
+
+        if (ty2 < tmax)
+            tmax = ty2;
+    }
+    else
+    {
+        // Movement is horizontal.
+        // Check whether the y coordinate is inside block.
+        if (prevPosition.y < expanded.y ||
+            prevPosition.y > expanded.y + expanded.height)
+        {
+            return false;
+        }
+    }
+
+
+    // No intersection
+    if (tmin > tmax)
+        return false;
+
+    if (tmin < 0.0f || tmin > 1.0f)
+        return false;
+
+
+    // =====================================================
+    // Find collision point
+    // =====================================================
+
+    Vector2 collisionPoint =
+    {
+        prevPosition.x + movement.x * tmin,
+        prevPosition.y + movement.y * tmin
+    };
+
+
+    // =====================================================
+    // Find which side of the block was hit
+    // =====================================================
+
+    float left   = fabsf(collisionPoint.x - expanded.x);
+    float right  = fabsf(collisionPoint.x - (expanded.x + expanded.width));
+    float top    = fabsf(collisionPoint.y - expanded.y);
+    float bottom = fabsf(collisionPoint.y - (expanded.y + expanded.height));
+
+    float smallest = left;
+
+    Vector2 normal = { -1.0f, 0.0f };
+
+
+    if (right < smallest)
+    {
+        smallest = right;
+        normal = (Vector2){ 1.0f, 0.0f };
+    }
+
+    if (top < smallest)
+    {
+        smallest = top;
+        normal = (Vector2){ 0.0f, -1.0f };
+    }
+
+    if (bottom < smallest)
+    {
+        smallest = bottom;
+        normal = (Vector2){ 0.0f, 1.0f };
+    }
+
+
+    // =====================================================
+    // Put ball outside the block
+    // =====================================================
+
+    position->x = collisionPoint.x + normal.x * radius;
+    position->y = collisionPoint.y + normal.y * radius;
+
+
+    // =====================================================
+    // TOP OF BLOCK
+    // =====================================================
+
+    if (normal.y < -0.5f)
+    {
+        // Exactly place ball on top
+        position->y = expanded.y - radius;
+
+        // Stop downward movement
+        if (speed->y > 0.0f)
+            speed->y = 0.0f;
+
+        return true;
+    }
+
+
+    // =====================================================
+    // BOTTOM OF BLOCK
+    // =====================================================
+
+    if (normal.y > 0.5f)
+    {
+        position->y = expanded.y + expanded.height + radius;
+
+        // Stop upward movement
+        if (speed->y < 0.0f)
+            speed->y = 0.0f;
+    }
+
+
+    // =====================================================
+    // LEFT SIDE
+    // =====================================================
+
+    if (normal.x < -0.5f)
+    {
+        position->x = expanded.x - radius;
+
+        // Stop movement into block
+        if (speed->x > 0.0f)
+            speed->x = 0.0f;
+    }
+
+
+    // =====================================================
+    // RIGHT SIDE
+    // =====================================================
+
+    if (normal.x > 0.5f)
+    {
+        position->x = expanded.x + expanded.width + radius;
+
+        // Stop movement into block
+        if (speed->x < 0.0f)
+            speed->x = 0.0f;
+    }
+
+
+    return false;
 }
 
 
-
-
-bool checkcollision(Vector2 *position, Vector2 *speed)
+bool checkcollision(Vector2 *position,
+                    Vector2 prevposition,
+                    Vector2 *speed)
 {
     bool onplatform = false;
 
     for (int i = 0; i < blockcount; i++)
     {
-        //if standing on a surface
-        if (resolveCircleBlock(position, speed, blocks[i].rect))
+        if (resolveCircleBlock(
+                position,
+                prevposition,
+                speed,
+                blocks[i].rect))
+        {
             onplatform = true;
+        }
     }
 
     return onplatform;
 }
 
+
+
 //for rederecting upwards collision of ball with ring
-bool checkcollisionringup ( Vector2 *position, Vector2 *speed){
+bool checkcollisionringup ( Vector2 *position,Vector2 prevposition, Vector2 *speed){
     bool onplatform = false;
 
         //if standing on a surface
-        if (resolveCircleBlock(position, speed, ringrecup))
+        if (resolveCircleBlock(position,prevposition, speed, ringrecup))
             onplatform = true;
 
     return onplatform;
 }
 
 //for rederecting downwards collision of ball with ring
-bool checkcollisionringdown ( Vector2 *position, Vector2 *speed){
+bool checkcollisionringdown ( Vector2 *position, Vector2 prevposition ,Vector2 *speed){
     bool onplatform = false;
 
-        //if standing on a surface
-        if (resolveCircleBlock(position, speed, ringrecdown))
+        //if  on a surface
+        if (resolveCircleBlock(position, prevposition, speed, ringrecdown))
             onplatform = true;
 
     return onplatform;
@@ -410,26 +604,6 @@ int main(){
                        /* ====================== FOR LEVEL 1, SET POSITIONS OF EVERYTHING ================= */
     
     startLevel(levelcount);
-
-    //ball
-    Texture2D ball= LoadTexture("assets/ball.png");
-    Rectangle source = {
-    0,
-    0,
-    ball.width,
-    ball.height
-};
-
-Rectangle destination = {
-    position.x,
-    position.y,
-    68,
-    68
-};
-Vector2 origin = {
-    destination.width / 2.0f,
-    destination.height / 2.0f
-};
 
 
     // if(levelcount ==2){
@@ -559,40 +733,30 @@ Vector2 origin = {
 
         if(!gameover){
 
-        Vector2 prevposition ;
 
+            bool onplatform;
         //for the speed of the ball when the collision happened once
         if(!respawn){
-        prevposition = (Vector2) position;
-        speed = Vector2Add(speed, Vector2Scale(gravity,dt));
-        position = Vector2Add(position, Vector2Scale(speed,dt));
+        // Save previous position
+prevposition = position;
 
-        ballRotation += (speed.x * dt / radius) * RAD2DEG;
+// Apply gravity
+speed = Vector2Add(speed, Vector2Scale(gravity, dt));
 
-        destination.x = position.x;
-        destination.y = position.y;
+// Move ball
+position = Vector2Add(position, Vector2Scale(speed, dt));
 
+// Check collision
+ onplatform = checkcollision(&position, prevposition, &speed);
 
-    }
-
-    //for checking if the ball is on the platform or not
-         bool onplatform = checkcollision(&position, &speed);
-
-    //for movement and jumping
-        if (IsKeyDown(KEY_RIGHT))
-            speed.x = maxspeedx;
-
-        else if (IsKeyDown(KEY_LEFT))
-            speed.x = -maxspeedx;
-        else
-            speed.x = 0;
-        if (IsKeyPressed(KEY_UP) && (onplatform )){
-            speed.y= - jumpspeed;
-            PlaySound(bounce);
-            ballRotation += (speed.x * dt / radius) * RAD2DEG;
+// NOW check for jump
+if (IsKeyPressed(KEY_UP) && onplatform)
+{
+    speed.y = -jumpspeed;
+    onplatform = false;
+    PlaySound(bounce);
+}
         }
-
-
     if(levelcount==1){
 
     //for the ball passing the ring
@@ -618,10 +782,10 @@ Vector2 origin = {
 
 
         //for checking ringup collision
-        bool onringup = checkcollisionringup(&position, &speed);
+        bool onringup = checkcollisionringup(&position, prevposition, &speed);
 
         //for checking ringdown collision
-        bool onringdown = checkcollisionringdown(&position, &speed);
+        bool onringdown = checkcollisionringdown(&position, prevposition, &speed);
 
         //for enemy1s movement
         enemy1position = Vector2Add(enemy1position, Vector2Scale(enemy1speed,dt));
@@ -770,14 +934,7 @@ Vector2 origin = {
             WHITE);
 
         //draw ball
-        DrawTexturePro(
-    ball,
-    source,
-    destination,
-    origin,
-    ballRotation,
-    WHITE
-);
+        DrawCircleV(position, radius, RED);
         
         //after ball, drawing back ring
         DrawTextureEx(
@@ -800,14 +957,8 @@ Vector2 origin = {
             WHITE);
 
         //draw ball
-        DrawTexturePro(
-    ball,
-    source,
-    destination,
-    origin,
-    ballRotation,
-    WHITE
-);
+        DrawCircleV(position, radius, RED);
+        
         //after ball, drawing back ring
         DrawTextureEx(
         ringbackbwtexture,
@@ -898,15 +1049,7 @@ Vector2 origin = {
 
 else if(levelcount==2){
     drawlevel();
-    //draw ball
-        DrawTexturePro(
-    ball,
-    source,
-    destination,
-    origin,
-    ballRotation,
-    WHITE
-);
+    DrawCircleV(position, radius, RED);
 
 }
 

@@ -7,7 +7,7 @@
 #define blocksize 45
 #define maxblocks 300
 #define maxspeedx 300
-#define radius 25
+#define radius 30
 #define jumpspeed 600
 #define Gravity 1200
 
@@ -139,37 +139,73 @@ void drawlevel(){
 // to change the position and speed after collision
     bool resolveCircleBlock(Vector2 *position, Vector2 *speed, Rectangle r)
 {
-    //find closest point of the block to the center of the ball
     float closestX = Clamp(position->x, r.x, r.x + r.width);
     float closestY = Clamp(position->y, r.y, r.y + r.height);
 
-    Vector2 closestPoint = { closestX, closestY };
+    Vector2 closestPoint = {closestX, closestY};
 
-    //after subtraction , the direction will be perpendicular to surface
     Vector2 difference = Vector2Subtract(*position, closestPoint);
 
     float distance = Vector2Length(difference);
 
-    if (distance > radius || distance == 0.0f)
+    // Ball is outside the block
+    if (distance > radius)
         return false;
 
-    // Normal is a direction only and points away from the block toward the ball.
+    // Ball center is inside the block
+    if (distance == 0.0f)
+    {
+        float left   = position->x - r.x;
+        float right  = (r.x + r.width) - position->x;
+        float top    = position->y - r.y;
+        float bottom = (r.y + r.height) - position->y;
+
+        float smallest = fminf(fminf(left, right), fminf(top, bottom));
+
+        if (smallest == top)
+        {
+            position->y = r.y - radius;
+            speed->y = 0;
+            return true;
+        }
+        else if (smallest == bottom)
+        {
+            position->y = r.y + r.height + radius;
+            speed->y = 0;
+        }
+        else if (smallest == left)
+        {
+            position->x = r.x - radius;
+            speed->x = 0;
+        }
+        else
+        {
+            position->x = r.x + r.width + radius;
+            speed->x = 0;
+        }
+
+        return false;
+    }
+
     Vector2 normal = Vector2Scale(difference, 1.0f / distance);
 
-    // Move ball outside the block,in the direcction to normal (perpendicular to the previous movement of the ball)
+    // Push ball outside block
     position->x = closestPoint.x + normal.x * radius;
     position->y = closestPoint.y + normal.y * radius;
 
-    // Remove only velocity going into the block.
+    // Remove velocity going into block
     float velocityIntoBlock = Vector2DotProduct(*speed, normal);
 
     if (velocityIntoBlock < 0.0f)
-        *speed = Vector2Subtract(*speed, Vector2Scale(normal, velocityIntoBlock));
-    
-    // True when standing on a surface.
+    {
+        *speed = Vector2Subtract(
+            *speed,
+            Vector2Scale(normal, velocityIntoBlock)
+        );
+    }
+
     return normal.y < -0.5f;
 }
-
 
 
 
@@ -221,12 +257,31 @@ int main(){
     levelgeneration1();
 
                     /* BALL*/
+    Texture2D ball= LoadTexture("assets/ball.png");
 
     // for generating the movement of the ball
     Vector2 position = {radius+blocksize, 500};
     Vector2 speed= Vector2Zero();
     Vector2 gravity = {0, Gravity};
 
+    Rectangle source = {
+    0,
+    0,
+    ball.width,
+    ball.height
+};
+
+Rectangle destination = {
+    position.x,
+    position.y,
+    74,
+    74
+};
+
+Vector2 origin = {
+    37,37
+};
+float ballRotation =0;
                     /*ENEMY1*/
 
     //for the enemy1
@@ -300,12 +355,51 @@ int main(){
     while(!WindowShouldClose()){
         float dt = GetFrameTime();
 
+
         //for the speed of the ball when the collision happened once
         if(!respawn){
         Vector2 prevposition = position;
-        speed = Vector2Add(speed, Vector2Scale(gravity,dt));
-        position = Vector2Add(position, Vector2Scale(speed,dt));
+        float dt = GetFrameTime();
 
+    // =========================
+    // MOVEMENT INPUT
+    // =========================
+
+    if (IsKeyDown(KEY_RIGHT))
+        speed.x = maxspeedx;
+
+    else if (IsKeyDown(KEY_LEFT))
+        speed.x = -maxspeedx;
+
+    else
+        speed.x = 0;
+
+
+    // =========================
+    // PHYSICS
+    // =========================
+
+    speed = Vector2Add(speed, Vector2Scale(gravity, dt));
+
+    position = Vector2Add(
+        position,
+        Vector2Scale(speed, dt)
+    );
+
+
+    // =========================
+    // ROTATION
+    // =========================
+
+    ballRotation += (speed.x * dt / radius) * RAD2DEG;
+
+
+    // =========================
+    // UPDATE DRAW POSITION
+    // =========================
+
+    destination.x = position.x;
+    destination.y = position.y;
         //for the ball passing the ring
         if (!checkringcolor && prevposition.x > ringbackposition.x && position.x <= ringbackposition.x && position.y > 10 * blocksize && position.y < 12 * blocksize)
     {
@@ -335,17 +429,11 @@ int main(){
         //for checking ringdown collision
         bool onringdown = checkcollisionringdown(&position, &speed);
 
-        //for movement and jumping
-        if (IsKeyDown(KEY_RIGHT))
-            speed.x = maxspeedx;
-
-        else if (IsKeyDown(KEY_LEFT))
-            speed.x = -maxspeedx;
-        else
-            speed.x = 0;
+        
         if (IsKeyPressed(KEY_UP) && (onplatform || onringdown)){
             speed.y= - jumpspeed;
             PlaySound(bounce);
+            ballRotation += (speed.x * dt / radius) * RAD2DEG;
         }
 
         //for enemy1s movement
@@ -410,6 +498,9 @@ int main(){
 
         BeginDrawing();
         ClearBackground(SKYBLUE);
+        DrawText(TextFormat("Y = %.1f", position.y),
+             200, 200, 20, BLACK);
+
 
         //draw gem
         if(!gempass){
@@ -437,8 +528,16 @@ int main(){
             ringsize,
             WHITE);
 
+
         //draw ball
-        DrawCircleV(position, radius, RED);
+        DrawTexturePro(
+    ball,
+    source,
+    destination,
+    origin,
+    ballRotation,
+    WHITE
+);
         
         //after ball, drawing back ring
         DrawTextureEx(
@@ -461,7 +560,16 @@ int main(){
             WHITE);
 
         //draw ball
-        DrawCircleV(position, radius, RED);
+        //draw ball
+        DrawTexturePro(
+    ball,
+    source,
+    destination,
+    origin,
+    ballRotation,
+    WHITE
+);
+        
         
         //after ball, drawing back ring
         DrawTextureEx(

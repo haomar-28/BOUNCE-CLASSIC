@@ -1,1 +1,1 @@
-(Vector2){14*blocksize, 13*blocksize}
+DrawText("LOADING",);
