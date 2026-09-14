@@ -11,6 +11,8 @@
 #define jumpspeed 600
 #define Gravity 1200
 
+// dev
+
     Vector2 position1= {radius+blocksize, 500};
     Vector2 position2 = {100,blocksize +radius};
     Vector2 position3;

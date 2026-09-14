@@ -92,9 +92,11 @@ int main(){
         // =====================
         // NEXT WINDOW
         // =====================
+        //dev 
 
         BeginDrawing();
 
+        //drawbuttons
         DrawTexturePro(menubar, (Rectangle){0, 0, menubar.width, menubar.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
 
             if(rules ==0){
