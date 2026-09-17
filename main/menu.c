@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include"raylib.h"
 #include"raymath.h"
 
@@ -25,6 +26,24 @@ int main(){
     Texture2D leaderboardbutton = LoadTexture("assets/leaderboardbutton.png");
     Texture2D leaderboardglowing = LoadTexture("assets/leaderboardglowing.png");
     
+    printf("Current directory:\n");
+system("pwd");
+
+printf("Checking file...\n");
+
+if (FileExists("assets/rules.png")) {
+    printf("YES: file exists\n");
+} else {
+    printf("NO: file does not exist\n");
+}
+
+Texture2D rulesbg = LoadTexture("assets/rules.png");
+
+printf("Texture ID: %u\n", rulesbg.id);
+printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
+
+    Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
+
 
 
     while(!WindowShouldClose()){
@@ -78,14 +97,27 @@ int main(){
 
         if(CheckCollisionPointRec(mousepos, playrec)){
             play=1;
+            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                play=2;
+            }
         }
         else play =0;
-        if(CheckCollisionPointRec(mousepos, rulesrec)){
-            rules=1;
+
+        if (rules != 2) {
+        if (CheckCollisionPointRec(mousepos, rulesrec)) {
+        rules = 1;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            rules = 2;
         }
-        else rules=0;
+        } else {
+            rules = 0;
+    }
+}
         if(CheckCollisionPointRec(mousepos, leaderboardrec)){
             leaderboard=1;
+            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                leaderboard=2;
+            }
         }
         else leaderboard =0; 
         
@@ -102,9 +134,14 @@ int main(){
             if(rules ==0){
         DrawTexturePro(rulesbutton, (Rectangle){0, 0, rulesbutton.width, rulesbutton.height},(Rectangle){420, 300,rulesbutton.width, rulesbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            else{
+            else if(rules==2){
+                DrawTexturePro(rulesbg, (Rectangle){0, 0, rulesbg.width, rulesbg.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+            if(rules==1){
                 DrawTexturePro(rulesglowing, (Rectangle){0, 0, rulesglowing.width, rulesglowing.height},(Rectangle){420, 300,rulesglowing.width, rulesglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
+            
+
 
             if(play ==0){
         DrawTexturePro(playbutton, (Rectangle){0, 0, playbutton.width, playbutton.height},(Rectangle){420, 100,playbutton.width, playbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
@@ -135,6 +172,9 @@ int main(){
     UnloadTexture(rulesglowing);
     UnloadTexture(leaderboardbutton);
     UnloadTexture(leaderboardglowing);
+    UnloadTexture(rulesbg);
+    UnloadTexture(rulesbackglowing);
+
     
 }
 

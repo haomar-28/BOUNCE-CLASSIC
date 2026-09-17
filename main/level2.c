@@ -248,9 +248,9 @@ void drawlevel(){
         Rectangle r= blocks[i]. rect;
 
         //main block
-        DrawRectangleRec(r,RED);
+        DrawRectangleRec(r,MAROON);
         //dark outline
-        DrawRectangleLinesEx(r,3, MAROON);
+        DrawRectangleLinesEx(r,3, RED);
         //highlight
         DrawLine(
             r.x+5,
