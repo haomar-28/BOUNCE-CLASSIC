@@ -10,6 +10,7 @@
 int main(){
 
     InitWindow(screenwidth, screenheight, "Menu");
+    InitAudioDevice();
 
     int loading =0;
     int play=0;
@@ -25,24 +26,12 @@ int main(){
     Texture2D rulesglowing = LoadTexture("assets/rulesglowing.png");
     Texture2D leaderboardbutton = LoadTexture("assets/leaderboardbutton.png");
     Texture2D leaderboardglowing = LoadTexture("assets/leaderboardglowing.png");
-    
-    printf("Current directory:\n");
-system("pwd");
+    Sound buttonsound = LoadSound("assets/buttonsound.mp3");
 
-printf("Checking file...\n");
-
-if (FileExists("assets/rules.png")) {
-    printf("YES: file exists\n");
-} else {
-    printf("NO: file does not exist\n");
-}
-
-Texture2D rulesbg = LoadTexture("assets/rules.png");
-
-printf("Texture ID: %u\n", rulesbg.id);
-printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
+    Texture2D rulesbg = LoadTexture("assets/rulesbg.png");
 
     Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
+
 
 
 
@@ -94,32 +83,57 @@ printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
         Rectangle playrec = {420, 100, playbutton.width, playbutton.height};
         Rectangle rulesrec = {420, 300, rulesbutton.width, rulesbutton.height};
         Rectangle leaderboardrec = {420, 500, leaderboardbutton.width, leaderboardbutton.height};
+        Rectangle rulesbackrec = {385, 670, 300,88};
+        int rulesbackpressed= 0;
 
-        if(CheckCollisionPointRec(mousepos, playrec)){
-            play=1;
-            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                play=2;
-            }
+        //next we'll add play==2
+        if (play != 2) {
+        if (CheckCollisionPointRec(mousepos, playrec)) {
+        play = 1;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            
+     PlaySound(buttonsound);
         }
-        else play =0;
+        } else {
+            play = 0;
+    }
 
         if (rules != 2) {
         if (CheckCollisionPointRec(mousepos, rulesrec)) {
         rules = 1;
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            rules = 2;
+            rules =2;
+            PlaySound(buttonsound);
         }
         } else {
             rules = 0;
     }
 }
-        if(CheckCollisionPointRec(mousepos, leaderboardrec)){
-            leaderboard=1;
-            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-                leaderboard=2;
-            }
+        if (rules == 2) {
+    if (CheckCollisionPointRec(mousepos, rulesbackrec)) {
+        rulesbackpressed = 1;
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+            rules = 0;
         }
-        else leaderboard =0; 
+    }
+    else {
+        rulesbackpressed = 0;
+    }
+}
+
+        if (leaderboard != 2) {
+        if (CheckCollisionPointRec(mousepos, leaderboardrec)) {
+        leaderboard = 1;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+            
+        }
+        } else {
+            leaderboard = 0;
+    }
+}
         
         // =====================
         // NEXT WINDOW
@@ -128,15 +142,24 @@ printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
 
         BeginDrawing();
 
+        if(rules==2){
+                DrawTexturePro(rulesbg, (Rectangle){0, 0, rulesbg.width, rulesbg.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+            
+                if(rulesbackpressed==1){
+
+                    DrawTexturePro(rulesbackglowing,(Rectangle){0,0, rulesbackglowing.width, rulesbackglowing.height},rulesbackrec,(Vector2){0,0}, 0.0f, WHITE);
+                }
+                
+            }
+
+        else{
         //drawbuttons
         DrawTexturePro(menubar, (Rectangle){0, 0, menubar.width, menubar.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
 
             if(rules ==0){
         DrawTexturePro(rulesbutton, (Rectangle){0, 0, rulesbutton.width, rulesbutton.height},(Rectangle){420, 300,rulesbutton.width, rulesbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            else if(rules==2){
-                DrawTexturePro(rulesbg, (Rectangle){0, 0, rulesbg.width, rulesbg.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
-            }
+
             if(rules==1){
                 DrawTexturePro(rulesglowing, (Rectangle){0, 0, rulesglowing.width, rulesglowing.height},(Rectangle){420, 300,rulesglowing.width, rulesglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
@@ -146,21 +169,23 @@ printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
             if(play ==0){
         DrawTexturePro(playbutton, (Rectangle){0, 0, playbutton.width, playbutton.height},(Rectangle){420, 100,playbutton.width, playbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            else{
+            if(play==1){
                 DrawTexturePro(playglowing, (Rectangle){0, 0, playglowing.width, playglowing.height},(Rectangle){420, 100,playglowing.width, playglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
 
             if(leaderboard ==0){
         DrawTexturePro(leaderboardbutton, (Rectangle){0, 0, leaderboardbutton.width, leaderboardbutton.height},(Rectangle){420, 500,leaderboardbutton.width, leaderboardbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            else{
+            if(leaderboard==1){
                 DrawTexturePro(leaderboardglowing, (Rectangle){0, 0, leaderboardglowing.width, leaderboardglowing.height},(Rectangle){420, 500,leaderboardglowing.width, leaderboardglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-        
-
+        }
+    }
 
         EndDrawing();
     }
+
+
 
 
     }
@@ -174,6 +199,7 @@ printf("Width: %d, Height: %d\n", rulesbg.width, rulesbg.height);
     UnloadTexture(leaderboardglowing);
     UnloadTexture(rulesbg);
     UnloadTexture(rulesbackglowing);
+    UnloadSound(buttonsound);
 
     
 }
