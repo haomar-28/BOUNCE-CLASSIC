@@ -1,1 +1,1 @@
-DrawText("LOADING",);
+t

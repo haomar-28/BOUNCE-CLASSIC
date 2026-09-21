@@ -1,5 +1,8 @@
+#include<stdio.h>
+#include<stdlib.h>
 #include"raylib.h"
 #include"raymath.h"
+#include<string.h>
 
 
 #define screenwidth 1080
@@ -10,6 +13,105 @@
 #define radius 30
 #define jumpspeed 600
 #define Gravity 1200
+
+typedef struct 
+{
+    char name[100];
+    int score;
+}Player;
+
+
+//save the info of the player
+
+void savescore(char name[], int score){
+    Player players[1000];
+    int count =0;
+
+    FILE *file = fopen ("leaderboard.txt", "r");
+    //read old scores
+
+    if(file != NULL) {
+
+    while(count < 100 && fscanf(file, "%99[^|]|%d\n",players[count].name, &players[count].score) ==2){
+        count++;
+    }
+    fclose(file);
+}
+
+    // adding current player
+    strcpy(players[count].name, name);
+    players[count].score = score;
+    count ++;
+
+    //sort the scores
+
+    for (int i=0; i<count-1; i++){
+        for(int j=i+1; j<count ;j++){
+            if(players[j].score >players[i].score){
+                Player temp = players[i];
+                players[i] = players[j];
+                players[j]= temp;
+
+            }
+        }
+    }
+
+    //only keep top 10
+    if(count >10)count =10;
+
+    //rewrite the file
+    file = fopen("leaderboard.txt", "w");
+    
+    if(file == NULL){
+        return;
+    }
+    
+    for(int i=0; i<count ; i++){
+        fprintf(file,"%s|%d\n",players[i].name, players[i].score);
+    }
+
+    fclose(file);
+}
+
+
+void drawleaderboard(){
+    Player players[10];
+    int count =0;
+
+    FILE *file = fopen("leaderboard.txt", "r");
+
+    if(file != NULL){
+        while(count <10 && fscanf(file, "%99[^|]|%d\n",players[count].name, &players[count].score)==2){
+            count++;
+        }
+        fclose(file);
+    }
+
+    ClearBackground(LIGHTGRAY);
+
+    DrawText("LEADERBOARD", 400, 40, 50,DARKBLUE);
+
+    DrawText(TextFormat("SL no. \t\t\tPLAYER \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSCORE"),70,170,30, BLACK);
+
+    DrawRectangle(0,220,screenwidth, 50,MAROON);
+    DrawRectangle(0,270,screenwidth, 50,RED);
+    DrawRectangle(0,320,screenwidth, 50,ORANGE);
+
+   
+
+    for(int i=0; i<count; i++){
+
+    DrawText(TextFormat("%d", i+1),90, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+
+    DrawText(players[i].name,250, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+
+    DrawText(TextFormat("%d", players[i].score),800, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+}
+}
+
+
+
+
 
 // dev
 
@@ -83,6 +185,9 @@ float ballRotation =0;
 
     Vector2 explosionposition;
     Rectangle explosionrec;
+    
+
+    int score =0;
 
 
 //define block data type
@@ -406,6 +511,41 @@ int main(){
 
 
 
+    int loading =0;
+    int play=0;
+    int rules =0;
+    int leaderboard =0;
+
+    char name[100] = "";
+    int namelength =0;
+    int entername= 1;//to determine when the name input ends
+    int score =0;
+    int startgame =0;
+    int namecount=0;
+
+    int menu=0;
+    int scoresaved =0;
+
+    
+    Texture2D first_background = LoadTexture("assets/firstpage.png");
+    Texture2D menubar = LoadTexture("assets/menubar.png");
+
+    Texture2D playbutton = LoadTexture("assets/playbutton.png");
+    Texture2D playglowing = LoadTexture("assets/playglowing.png");
+    Texture2D rulesbutton = LoadTexture("assets/rulesbutton.png");
+    Texture2D rulesglowing = LoadTexture("assets/rulesglowing.png");
+    Texture2D leaderboardbutton = LoadTexture("assets/leaderboardbutton.png");
+    Texture2D leaderboardglowing = LoadTexture("assets/leaderboardglowing.png");
+    
+
+    Texture2D rulesbg = LoadTexture("assets/rulesbg.png");
+
+    Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
+
+    Texture2D startgamebutton =LoadTexture("assets/startgamebutton.png");
+    Texture2D startgameglowing =LoadTexture("assets/startgameglowing.png");
+
+
 
     int levelcount =1;
                     
@@ -526,7 +666,7 @@ Vector2 origin = {
 
     float buttonscale = 0.25f;
     float buttonradius= button.height/2 * (buttonscale);
-    Vector2 buttonpos = {500, 500};
+    Vector2 buttonpos = {500, 520};
     Vector2 buttoncenter = {buttonpos.x +buttonradius, buttonpos.y +buttonradius};
     int btnstate =0;
     bool btnaction;
@@ -559,6 +699,244 @@ Vector2 origin = {
     while(!WindowShouldClose()){
         float dt = GetFrameTime();
 
+        if(startgame==0){
+
+        if(!loading){
+        BeginDrawing();
+       
+
+    DrawTexturePro(first_background, (Rectangle){0, 0, first_background.width, first_background.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+
+    DrawText("LOADING", 420, 650, 50, BLACK);
+
+    EndDrawing();
+
+    WaitTime(1.0);
+
+    BeginDrawing();
+
+    DrawTexturePro(first_background,(Rectangle){0, 0, first_background.width, first_background.height},(Rectangle){0, 0, screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+
+    DrawText("LOADING.", 420, 650, 50, BLACK);
+
+    EndDrawing();
+
+    WaitTime(1.0);
+
+    BeginDrawing();
+
+    DrawTexturePro(first_background,(Rectangle){0, 0, first_background.width, first_background.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+
+    DrawText("LOADING. .", 420, 650, 50, BLACK);
+
+    EndDrawing();
+    WaitTime(1.0);
+
+    BeginDrawing();
+
+    DrawTexturePro(first_background,(Rectangle){0, 0, first_background.width, first_background.height},(Rectangle){0, 0,screenwidth, screenheight}, (Vector2){0, 0}, 0.0f, WHITE);
+
+    DrawText("LOADING. . .", 420, 650, 50, BLACK);
+
+    EndDrawing();
+    WaitTime(0.5f);
+    loading =1;
+    menu =1;
+    }
+    else
+        {
+        Vector2 mousepos = GetMousePosition();
+
+        Rectangle playrec = {420, 100, playbutton.width, playbutton.height};
+        Rectangle rulesrec = {420, 300, rulesbutton.width, rulesbutton.height};
+        Rectangle leaderboardrec = {420, 500, leaderboardbutton.width, leaderboardbutton.height};
+        Rectangle rulesbackrec = {385, 670, 300,88};
+
+        Rectangle startgamerec = {390, 700, startgamebutton.width/3, startgamebutton.height/3};
+
+
+        int rulesbackpressed= 0;
+
+
+
+        if (menu == 1 && play != 2) {
+
+        if (CheckCollisionPointRec(mousepos, playrec)) {
+
+        play = 1;
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+
+            play = 2;
+            entername = 1;
+            namelength = 0;
+            menu =0;
+            name[0] = '\0';
+        }
+
+    } else {
+        play = 0;
+    }
+}
+
+
+    else if(play==2 && entername ==1){
+        
+        int key = GetCharPressed();
+        while(key>0){
+            if((key>= 32) && (key<=125) && namelength <99){
+                name[namelength] = (char)key;
+                namelength++;
+                name[namelength] ='\0';
+            }
+
+            key= GetCharPressed();
+        }
+            if(IsKeyPressed(KEY_BACKSPACE)){
+                if(namelength>0){
+                    namelength--;
+                    name[namelength] = '\0';
+                }
+            }
+        }
+
+        
+    
+
+        if (menu == 1 && rules != 2) {
+        if (CheckCollisionPointRec(mousepos, rulesrec)) {
+        rules = 1;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            rules =2;
+            menu =0;
+            PlaySound(buttonsound);
+        }
+        } else {
+            rules = 0;
+    }
+}
+        else if (rules == 2) {
+    if (CheckCollisionPointRec(mousepos, rulesbackrec)) {
+        rulesbackpressed = 1;
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+            rules = 0;
+            menu =1 ;
+        }
+    }
+    else {
+        rulesbackpressed = 0;
+    }
+}
+
+        if (menu == 1 && leaderboard != 2) {
+        if (CheckCollisionPointRec(mousepos, leaderboardrec)) {
+        leaderboard = 1;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+            leaderboard=2;
+            menu =0;
+            
+        }
+        } else {
+            leaderboard = 0;
+    }
+}
+        
+        // =====================
+        // NEXT WINDOW
+        // =====================
+        //dev 
+
+        BeginDrawing();
+
+        if(play==2 && entername ==1){
+        ClearBackground(SKYBLUE);
+        DrawText("ENTER YOUR NAME", 350, 200, 40, MAROON);
+        DrawRectangle(300,300, 480, 70, LIGHTGRAY);
+        DrawRectangleLines(300,300, 480, 70, BLACK);
+
+        DrawText(name, 320, 320 ,30, BLACK);
+        
+       
+        DrawTexturePro(startgamebutton, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
+
+        
+        if(CheckCollisionPointRec(mousepos, startgamerec)){
+            DrawTexturePro(startgameglowing, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
+            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                PlaySound(buttonsound);
+                startgame = 1;
+
+                if(namelength ==0){
+                    strcpy(name, "not given");
+                }
+                entername =0;
+            }
+        }
+            
+    }
+
+        else if(rules==2){
+                DrawTexturePro(rulesbg, (Rectangle){0, 0, rulesbg.width, rulesbg.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+            
+                if(rulesbackpressed==1){
+
+                    DrawTexturePro(rulesbackglowing,(Rectangle){0,0, rulesbackglowing.width, rulesbackglowing.height},rulesbackrec,(Vector2){0,0}, 0.0f, WHITE);
+
+                }
+                
+            }
+        
+           else if(leaderboard==2){
+                drawleaderboard();
+
+                DrawText("PRESS 'B' TO GO BACK",500, 760, 40, PURPLE);
+                if(IsKeyPressed(KEY_B)){
+                leaderboard=0;
+                menu =1;
+        }
+            }
+
+        else if(menu==1){
+        //drawbuttons
+        
+        DrawTexturePro(menubar, (Rectangle){0, 0, menubar.width, menubar.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
+
+            if(rules ==0){
+        DrawTexturePro(rulesbutton, (Rectangle){0, 0, rulesbutton.width, rulesbutton.height},(Rectangle){420, 300,rulesbutton.width, rulesbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+
+            else if(rules==1){
+                DrawTexturePro(rulesglowing, (Rectangle){0, 0, rulesglowing.width, rulesglowing.height},(Rectangle){420, 300,rulesglowing.width, rulesglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+            
+
+
+            if(play ==0){
+        DrawTexturePro(playbutton, (Rectangle){0, 0, playbutton.width, playbutton.height},(Rectangle){420, 100,playbutton.width, playbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+            else if(play==1){
+                DrawTexturePro(playglowing, (Rectangle){0, 0, playglowing.width, playglowing.height},(Rectangle){420, 100,playglowing.width, playglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+
+            if(leaderboard ==0){
+        DrawTexturePro(leaderboardbutton, (Rectangle){0, 0, leaderboardbutton.width, leaderboardbutton.height},(Rectangle){420, 500,leaderboardbutton.width, leaderboardbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+            else if(leaderboard==1){
+                DrawTexturePro(leaderboardglowing, (Rectangle){0, 0, leaderboardglowing.width, leaderboardglowing.height},(Rectangle){420, 500,leaderboardglowing.width, leaderboardglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
+            }
+         
+        }
+    
+
+        EndDrawing();
+    }
+}
+
+    else if(startgame ==1){
         if(!gameover){
 
         Vector2 prevposition ;
@@ -573,7 +951,6 @@ Vector2 origin = {
 
         destination.x = position.x;
         destination.y = position.y;
-
 
     }
 
@@ -736,7 +1113,14 @@ Vector2 origin = {
         if(btnstate==2){
             PlaySound(buttonsound);
         }
+
+        score = ringcount*5 +gemcount*10;
+        if(scoresaved==0){
+        savescore(name,score);
+        scoresaved=1;
+        }
     }
+
 
 
         BeginDrawing();
@@ -852,6 +1236,15 @@ Vector2 origin = {
 
         DrawText("GAME OVER", 380, 280, 50, RED);
         DrawText("CLICK BUTTON TO RESTART",330, 450, 30, RED);
+        DrawText("PRESS 'M' TO GO TO MAIN MENU",280, 490, 30, LIGHTGRAY);
+
+        if(IsKeyPressed(KEY_M)){
+            menu=1;
+            startgame=0;
+            play=0;
+            leaderboard=0;
+            rules=0;
+        }
 
         
         DrawTextureEx(button, buttonpos, 0.0f, buttonscale, WHITE);
@@ -866,6 +1259,9 @@ Vector2 origin = {
         //draw gem point
         DrawText(TextFormat("%d", gemcount), 620, 360, 30, WHITE);
         DrawTextureEx(gem, (Vector2){580, 360}, 0.0f, gemsize, WHITE);
+
+        //draw score
+        DrawText(TextFormat("Your Score: %d", score), 400, 400, 40, GRAY);
 
 
         
@@ -894,6 +1290,9 @@ Vector2 origin = {
             lifecount = 3;
 
             btnstate=0;
+
+            score =0;
+            scoresaved=0;
         }
     }
 }
@@ -914,6 +1313,7 @@ else if(levelcount==2){
 
         EndDrawing();
 }
+    }
 
     UnloadTexture(explosiontext);
     UnloadSound(explosion);
@@ -925,7 +1325,7 @@ else if(levelcount==2){
     UnloadTexture(ringfrontbwtexture);
     UnloadTexture(ringfulltexture);
     UnloadSound(ringpasssound);
-    UnloadSound(buttonsound);
+    
     UnloadTexture(hoveredbutton);
     UnloadTexture(button);
     UnloadTexture(life);
@@ -935,6 +1335,19 @@ else if(levelcount==2){
     UnloadSound(levelpass);
     UnloadSound(lastlife);
     UnloadSound(lifeover);
+    UnloadTexture(first_background);
+    UnloadTexture(menubar);
+    UnloadTexture(playbutton);
+    UnloadTexture(playglowing);
+    UnloadTexture(rulesbutton);
+    UnloadTexture(rulesglowing);
+    UnloadTexture(leaderboardbutton);
+    UnloadTexture(leaderboardglowing);
+    UnloadTexture(rulesbg);
+    UnloadTexture(rulesbackglowing);
+    UnloadSound(buttonsound);
+    UnloadTexture(startgamebutton);
+    UnloadTexture(startgameglowing);
     CloseWindow();
 
     return 0;

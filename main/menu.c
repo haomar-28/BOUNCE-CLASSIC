@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include"raylib.h"
 #include"raymath.h"
+#include<string.h>
 
 
 #define screenwidth 1080
@@ -16,6 +17,14 @@ int main(){
     int play=0;
     int rules =0;
     int leaderboard =0;
+
+    char name[30] = "";
+    int namelength =0;
+    int entername= 1;//to determine when the name input ends
+    int score =0;
+    int startlevel =0;
+    int namecount=0;
+
     
     Texture2D first_background = LoadTexture("assets/firstpage.png");
     Texture2D menubar = LoadTexture("assets/menubar.png");
@@ -31,6 +40,12 @@ int main(){
     Texture2D rulesbg = LoadTexture("assets/rulesbg.png");
 
     Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
+
+    Texture2D startgamebutton =LoadTexture("assets/startgamebutton.png");
+    Texture2D startgameglowing =LoadTexture("assets/startgameglowing.png");
+
+
+
 
 
 
@@ -84,21 +99,58 @@ int main(){
         Rectangle rulesrec = {420, 300, rulesbutton.width, rulesbutton.height};
         Rectangle leaderboardrec = {420, 500, leaderboardbutton.width, leaderboardbutton.height};
         Rectangle rulesbackrec = {385, 670, 300,88};
+
+        Rectangle startgamerec = {390, 700, startgamebutton.width/3, startgamebutton.height/3};
+
+
         int rulesbackpressed= 0;
 
         //next we'll add play==2
         if (play != 2) {
-        if (CheckCollisionPointRec(mousepos, playrec)) {
-        play = 1;
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            
-     PlaySound(buttonsound);
-        }
-        } else {
-            play = 0;
-    }
 
-        if (rules != 2) {
+        if (CheckCollisionPointRec(mousepos, playrec)) {
+
+        play = 1;
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            PlaySound(buttonsound);
+
+            play = 2;
+            entername = 1;
+            namelength = 0;
+            name[0] = '\0';
+        }
+
+    } else {
+        play = 0;
+    }
+}
+
+
+    if(play==2 && entername ==1){
+        
+        int key = GetCharPressed();
+        while(key>0){
+            if((key>= 32) && (key<=125) && namelength <29){
+                name[namelength] = (char)key;
+                namelength++;
+                name[namelength] ='\0';
+            }
+
+            key= GetCharPressed();
+        }
+            if(IsKeyPressed(KEY_BACKSPACE)){
+                if(namelength>0){
+                    namelength--;
+                    name[namelength] = '\0';
+                }
+            }
+        }
+
+        
+    
+
+         if (rules != 2) {
         if (CheckCollisionPointRec(mousepos, rulesrec)) {
         rules = 1;
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -109,7 +161,7 @@ int main(){
             rules = 0;
     }
 }
-        if (rules == 2) {
+         if (rules == 2) {
     if (CheckCollisionPointRec(mousepos, rulesbackrec)) {
         rulesbackpressed = 1;
 
@@ -142,7 +194,35 @@ int main(){
 
         BeginDrawing();
 
-        if(rules==2){
+        if(play==2 && entername ==1){
+        ClearBackground(SKYBLUE);
+        DrawText("ENTER YOUR NAME", 350, 200, 40, MAROON);
+        DrawRectangle(300,300, 480, 70, LIGHTGRAY);
+        DrawRectangleLines(300,300, 480, 70, BLACK);
+
+        DrawText(name, 320, 320 ,30, BLACK);
+        DrawText("PRESS ENTER TO FINISH NAME", 400, 400, 40, MAROON);
+       
+        DrawTexturePro(startgamebutton, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
+
+        
+        if(CheckCollisionPointRec(mousepos, startgamerec)){
+            DrawTexturePro(startgameglowing, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
+            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                PlaySound(buttonsound);
+                startlevel = 1;
+                play =0;
+
+                if(namelength ==0){
+                    strcpy(name, "not given");
+                }
+                entername =0;
+            }
+        }
+            
+    }
+
+        else if(rules==2){
                 DrawTexturePro(rulesbg, (Rectangle){0, 0, rulesbg.width, rulesbg.height},(Rectangle){0, 0,screenwidth, screenheight},(Vector2){0, 0}, 0.0f, WHITE);
             
                 if(rulesbackpressed==1){
@@ -160,7 +240,7 @@ int main(){
         DrawTexturePro(rulesbutton, (Rectangle){0, 0, rulesbutton.width, rulesbutton.height},(Rectangle){420, 300,rulesbutton.width, rulesbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
 
-            if(rules==1){
+            else if(rules==1){
                 DrawTexturePro(rulesglowing, (Rectangle){0, 0, rulesglowing.width, rulesglowing.height},(Rectangle){420, 300,rulesglowing.width, rulesglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
             
@@ -169,18 +249,18 @@ int main(){
             if(play ==0){
         DrawTexturePro(playbutton, (Rectangle){0, 0, playbutton.width, playbutton.height},(Rectangle){420, 100,playbutton.width, playbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            if(play==1){
+            else if(play==1){
                 DrawTexturePro(playglowing, (Rectangle){0, 0, playglowing.width, playglowing.height},(Rectangle){420, 100,playglowing.width, playglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
 
             if(leaderboard ==0){
         DrawTexturePro(leaderboardbutton, (Rectangle){0, 0, leaderboardbutton.width, leaderboardbutton.height},(Rectangle){420, 500,leaderboardbutton.width, leaderboardbutton.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
-            if(leaderboard==1){
+            else if(leaderboard==1){
                 DrawTexturePro(leaderboardglowing, (Rectangle){0, 0, leaderboardglowing.width, leaderboardglowing.height},(Rectangle){420, 500,leaderboardglowing.width, leaderboardglowing.height},(Vector2){0, 0}, 0.0f, WHITE);
             }
         }
-    }
+    
 
         EndDrawing();
     }
@@ -200,7 +280,8 @@ int main(){
     UnloadTexture(rulesbg);
     UnloadTexture(rulesbackglowing);
     UnloadSound(buttonsound);
-
+    UnloadTexture(startgamebutton);
+    UnloadTexture(startgameglowing);
     
 }
 
