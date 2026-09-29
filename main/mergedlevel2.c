@@ -137,16 +137,41 @@ float ballRotation =0;
     float enemy1size;
     int enemycol;
 
-    Vector2 ringbackposition;
-
-    Vector2 ringbackposition1 = {11*blocksize,11*blocksize};
+    Vector2 ringbackposition1;
     Vector2 ringbackposition2;
     Vector2 ringbackposition3;
+    
 
-    Vector2 ringfrontposition;
-    Vector2 ringfrontposition1= {11*blocksize, 11*blocksize};
+    Vector2 ring1backposition1 = {11*blocksize,11*blocksize};
+    Vector2 ring1backposition2={3 * blocksize, 8 * blocksize};
+    Vector2 ring2backposition2= {23 * blocksize, 8 * blocksize};
+    Vector2 ring3backposition2 = {14.4 * blocksize, 11 * blocksize};
+
+
+    Vector2 ringfrontposition1;
     Vector2 ringfrontposition2;
     Vector2 ringfrontposition3;
+    
+    Vector2 ring1frontposition1= {11*blocksize, 11*blocksize};
+     Vector2 ring1frontposition2 = {3 * blocksize, 8 * blocksize};
+    Vector2 ring2frontposition2 = {23 * blocksize, 8 * blocksize};
+    Vector2 ring3frontposition2 = {14.4 * blocksize, 11 * blocksize};
+
+    Vector2 ring1backposition2 = {3 * blocksize, 8 * blocksize};
+    Vector2 ring1frontposition2 = {3 * blocksize, 8 * blocksize};
+    float ring1size2 = 0.35f;
+    float ring1radius2 = 24;
+
+    Vector2 ring2backposition2 = {23 * blocksize, 8 * blocksize};
+    Vector2 ring2frontposition2 = {23 * blocksize, 8 * blocksize};
+    // defining rings structure
+    float ring2size2 = 0.3f;
+    float ring2radius2 = 20;
+
+    Vector2 ring3backposition2 = {14.4 * blocksize, 11 * blocksize};
+    Vector2 ring3frontposition2 = {14.4 * blocksize, 11 * blocksize};
+    float ring3size2 = 0.22f;
+    float ring3radius2 = 21;
 
 
     float ringsize;
@@ -175,53 +200,82 @@ float ballRotation =0;
     float spike2size = 40;
     // for spike rectangle
     Vector2 spike2position2 = {11.3 * blocksize, 7.6 * blocksize};
-    Rectangle spike2rect2 = {spike2position2.x, spike2position2.y, spike2size, spike2size};
+    
 
     float spike3size = 40;
     // for spikes rectangle
     Vector2 spike3position2 = {11.77 * blocksize, 7.6 * blocksize};
-    Rectangle spike3rect2 = {spike3position2.x, spike3position2.y, spike3size, spike3size};
-
+    
     float spike4size = 40;
     // for spikes rectangle
     Vector2 spike4position2 = {12.24 * blocksize, 7.6 * blocksize};
-    Rectangle spike4rect2 = {spike4position2.x, spike4position2.y, spike4size, spike4size};
+    
 
     float spike5size = 40;
     // for spikes rectangle
     Vector2 spike5position2 = {13.83 * blocksize, 7.6 * blocksize};
-    Rectangle spike5rect2 = {spike5position2.x, spike5position2.y, spike5size, spike5size};
+    
 
     float spike6size = 40;
     // for spikes rectangle
     Vector2 spike6position2 = {14.3 * blocksize, 7.6 * blocksize};
-    Rectangle spike6rect2 = {spike6position2.x, spike6position2.y, spike6size, spike6size};
+   
 
     float spike7size = 40;
     // for spikes rectangle
     Vector2 spike7position2= {14.77 * blocksize, 7.6 * blocksize};
-    Rectangle spike7rect2 = {spike7position2.x, spike7position2.y, spike4size, spike4size};
+    
 
     float spike8size = 40;
     // for spikes rectangle
     Vector2 spike8position2 = {6.7 * blocksize, 15.6 * blocksize};
-    Rectangle spike8rect2 = {spike8position2.x, spike8position2.y, spike4size, spike4size};
+    
 
     float spike9size = 40;
     // for spikes rectangle
     Vector2 spike9position2 = {7.17 * blocksize, 15.6 * blocksize};
-    Rectangle spike9rect2 = {spike9position2.x, spike9position.y, spike4size, spike4size};
+
+    float enemy1size2 = 80;
+    // for enemys rectangle
+    Vector2 enemy1position2 = {8 * blocksize, 1 * blocksize};
+    Vector2 enemy1speed2 = {0, 200};
+
+    float enemy2size2 = 45;
+    // for enemys rectangle
+    Vector2 enemy2position2 = {3 * blocksize, 10 * blocksize};
+    Vector2 enemy2speed2 = {0, 100};
+
+    float enemy3size2 = 80;
+    // for enemys rectangle
+    Vector2 enemy3position2 = {10.7 * blocksize, 10 * blocksize};
+    Vector2 enemy3speed2 = {0, 200};
+    
 
 
 // creating upper and lower boundaries for ring
 //hdsfds//
 
-    Rectangle ringrecup;
+    
+    Rectangle ringrecup1;
     Rectangle ringrecup2;
     Rectangle ringrecup3;
-    Rectangle ringrecup1 = {10*blocksize + 43, 10*blocksize+5, 15, 8 };
-    Rectangle ringrecdown;
-    Rectangle ringrecdown1 = {10 * blocksize + 43, 12* blocksize - 6, 15, 12};
+    Rectangle ringrecup4;
+
+    
+    Rectangle ring2recup2;
+    Rectangle ring3recup2;
+    Rectangle ring1recup1 = {10*blocksize + 43, 10*blocksize+5, 15, 8 };
+    
+
+    Rectangle ring1recdown2;
+    Rectangle ring2recdown2;
+    Rectangle ring3recdown2;
+    Rectangle ring4recdown;
+    Rectangle ring5recdown;
+
+    Rectangle ring1recdown1 = {10 * blocksize + 43, 12* blocksize - 6, 15, 12};
+
+    Rectangle ringrecdown1;
     Rectangle ringrecdown2;
     Rectangle ringrecdown3;
 
@@ -232,6 +286,49 @@ float ballRotation =0;
 
     Vector2 explosionposition;
     Rectangle explosionrec;
+
+
+    //spikerectangles
+
+    Rectangle spike1rect2 = {10.83 * blocksize, 7.6*blocksize, 40, 40};
+    Rectangle spike2rect2 = {11.3 * blocksize, 7.6 * blocksize, 40, 40};
+    
+    Rectangle spike3rect2 = {11.77 * blocksize, 7.6 * blocksize, 40, 40};
+
+    Rectangle spike4rect2 = {12.24 * blocksize, 7.6 * blocksize, 40, 40};
+    Rectangle spike5rect2 = {13.83 * blocksize, 7.6 * blocksize, 40, 40};
+    Rectangle spike6rect2 = {14.3 * blocksize, 7.6 * blocksize, 40, 40};
+    Rectangle spike7rect2 = {14.77 * blocksize, 7.6 * blocksize, 40, 40};
+    Rectangle spike8rect2 = {6.7 * blocksize, 15.6 * blocksize, 40, 40};
+
+    Rectangle spike9rect2 = {7.17 * blocksize, 15.6 * blocksize, 40, 40};
+
+    
+    // array for spikerects
+    Rectangle spikerects[] = {
+        {10.83 * blocksize, 7.6*blocksize, 40, 40}, {11.3 * blocksize, 7.6 * blocksize, 40, 40},{11.77 * blocksize, 7.6 * blocksize, 40, 40}, {12.24 * blocksize, 7.6 * blocksize, 40, 40}, {13.83 * blocksize, 7.6 * blocksize, 40, 40},
+        {14.3 * blocksize, 7.6 * blocksize, 40, 40}, {14.77 * blocksize, 7.6 * blocksize, 40, 40}, {6.7 * blocksize, 15.6 * blocksize, 40, 40}, {7.17 * blocksize, 15.6 * blocksize, 40, 40}};
+    int spikecount = 9;
+
+    Rectangle enemy1rect = {8 * blocksize, 1 * blocksize, 80,80};
+    Rectangle enemy2rect = {3 * blocksize, 10 * blocksize, 45,45};
+    Rectangle enemy3rect = {10.7 * blocksize, 10 * blocksize, 80,80};
+          
+
+    /* Ring 1 collision areas */
+    Rectangle ring1recup2 = {3 * blocksize - 5, 8 * blocksize - 024 - 16, 12, 8};
+    Rectangle ring1recdown2 = {3 * blocksize - 4.7, 8 * blocksize + 24 + 15, 12, 8};
+
+    /* Ring 2 collision areas */
+    Rectangle ring2left2 = {23 * blocksize - 93, 8 * blocksize - 15, 4, 10};
+    Rectangle ring2right2 = {23 * blocksize - 33, 8 * blocksize - 15, 4, 10};
+    /* Ring 3 collision areas */
+    Rectangle ring3recup2 = {14.4 * blocksize - 1.8, 11 * blocksize - 22 - 6, 7, 6};
+    Rectangle ring3recdown2 = {14.4 * blocksize - 1.8, 11 * blocksize + 22, 7, 6};
+
+    
+    Rectangle ring2recup2;
+    Rectangle ring3recup2;
     
 
     int score =0;
@@ -471,7 +568,7 @@ bool checkcollisionringup ( Vector2 *position, Vector2 *speed){
     bool onplatform = false;
 
         //if standing on a surface
-        if (resolveCircleBlock(position, speed, ringrecup))
+        if (resolveCircleBlock(position, speed, ringrecup1))
             onplatform = true;
 
     return onplatform;
@@ -482,7 +579,7 @@ bool checkcollisionringdown ( Vector2 *position, Vector2 *speed){
     bool onplatform = false;
 
         //if standing on a surface
-        if (resolveCircleBlock(position, speed, ringrecdown))
+        if (resolveCircleBlock(position, speed, ringrecdown1))
             onplatform = true;
 
     return onplatform;
@@ -501,15 +598,15 @@ void startLevel(int level)
         enemy1position = enemy1position1;
         enemy1speed = enemy1speed1;
 
-        ringbackposition = ringbackposition1;
-        ringfrontposition = ringfrontposition1;
+        ringbackposition1 = ring1backposition1;
+        ringfrontposition1 = ring1frontposition1;
 
         gemposition = gemposition1;
         flagpos = flagpos1;
         
 
-        ringrecup= ringrecup1;
-        ringrecdown= ringrecdown1;
+        ringrecup1= ring1recup1;
+        ringrecdown1= ring1recdown1;
     }
 // error
     else if(level == 2)
@@ -521,14 +618,14 @@ void startLevel(int level)
         enemy1position = enemy1position2;
         enemy1speed = enemy1speed2;
 
-        ringbackposition = ringbackposition2;
-        ringfrontposition = ringfrontposition2;
+        ringbackposition1 = ring1backposition2;
+        ringfrontposition2 = ring1frontposition2;
 
         gemposition = gemposition2;
         flagpos = flagpos2;
 
-        ringrecup= ringrecup2;
-        ringrecdown= ringrecdown2;
+        ringrecup1= ring1recup2;
+        ringrecdown1= ring1recdown2;
         
     }
 
@@ -548,6 +645,8 @@ void startLevel(int level)
     gemsize = 0.05f;
     ringsize = 0.4f;
     ringradius = 25;
+
+
 }
 
 
@@ -742,14 +841,12 @@ Vector2 origin = {
 
     
     
-
-
                        /*MUSIC*/
 
     Music menumusic = LoadMusicStream("assets/menumusic.mp3");
     Music gamemusic = LoadMusicStream("assets/gamemusic.mp3");
 
-
+    
     float timer =0;
 
 
@@ -1097,10 +1194,10 @@ Vector2 origin = {
     if(levelcount==1){
 
     //for the ball passing the ring
-        if (!checkringcolor && ((prevposition.x+radius > ringbackposition.x &&
-      position.x +radius <= ringbackposition.x) ||
-     (prevposition.x -radius < ringbackposition.x &&
-      position.x- radius >= ringbackposition.x)) &&
+        if (!checkringcolor && ((prevposition.x+radius > ringbackposition1.x &&
+      position.x +radius <= ringbackposition1.x) ||
+     (prevposition.x -radius < ringbackposition1.x &&
+      position.x- radius >= ringbackposition1.x)) &&
  position.y > 10 * blocksize && position.y < 12 * blocksize)
     {
         checkringcolor = true;
@@ -1272,7 +1369,7 @@ Vector2 origin = {
         DrawTextureEx(
         ringfronttexture,
         (Vector2){
-            ringfrontposition.x - ringfronttexture.width * ringsize / 2, ringfrontposition.y - ringfronttexture.height * ringsize / 2},
+            ringfrontposition1.x - ringfronttexture.width * ringsize / 2, ringfrontposition1.y - ringfronttexture.height * ringsize / 2},
             0.0f,
             ringsize,
             WHITE);
@@ -1291,7 +1388,7 @@ Vector2 origin = {
         DrawTextureEx(
         ringbacktexture,
         (Vector2){
-            ringbackposition.x - ringbacktexture.width * ringsize / 2, ringbackposition.y - ringbacktexture.height * ringsize / 2},
+            ringbackposition1.x - ringbacktexture.width * ringsize / 2, ringbackposition1.y - ringbacktexture.height * ringsize / 2},
             0.0f,
             ringsize,
             WHITE);
@@ -1302,7 +1399,7 @@ Vector2 origin = {
         DrawTextureEx(
         ringfrontbwtexture,
         (Vector2){
-            ringfrontposition.x - ringfronttexture.width * ringsize / 2, ringfrontposition.y - ringfronttexture.height * ringsize / 2},
+            ringfrontposition1.x - ringfronttexture.width * ringsize / 2, ringfrontposition1.y - ringfronttexture.height * ringsize / 2},
             0.0f,
             ringsize,
             WHITE);
@@ -1320,7 +1417,7 @@ Vector2 origin = {
         DrawTextureEx(
         ringbackbwtexture,
         (Vector2){
-            ringbackposition.x - ringbacktexture.width * ringsize / 2, ringbackposition.y - ringbacktexture.height * ringsize / 2},
+            ringbackposition1.x - ringbacktexture.width * ringsize / 2, ringbackposition1.y - ringbacktexture.height * ringsize / 2},
             0.0f,
             ringsize,
             WHITE);
