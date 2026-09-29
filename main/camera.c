@@ -1109,6 +1109,8 @@ int main(){
     Texture2D rulesglowing = LoadTexture("assets/rulesglowing.png");
     Texture2D leaderboardbutton = LoadTexture("assets/leaderboardbutton.png");
     Texture2D leaderboardglowing = LoadTexture("assets/leaderboardglowing.png");
+
+    Texture2D gamebg = LoadTexture("assets/gamebg.png");
  
     Texture2D credit = LoadTexture("assets/credit.png");
  
@@ -2633,7 +2635,7 @@ int main(){
  
         /* ====================== DRAWING ====================== */
         BeginDrawing();
-        ClearBackground(SKYBLUE);
+        DrawTexturePro(gamebg, (Rectangle){0,0, gamebg.width, gamebg.height},(Rectangle){0,0, screenwidth, screenheight} , (Vector2){0,0}, 0.0f, WHITE);
  
         // camera follows the ball but stays inside the wall boundaries
         updateCamera(&camera, position, levelcount);
