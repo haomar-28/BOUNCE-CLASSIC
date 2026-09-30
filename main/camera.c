@@ -1239,8 +1239,8 @@ int main(){
     Texture2D spike9 = LoadTexture("assets/spike.png");
  
     /* LEVEL 3 ASSETS */
-    Texture2D powerup3 = LoadTexture("assets/epowerup.png");
-    Texture2D smallpowerup3 = LoadTexture("assets/epowerup.png");
+    Texture2D powerup3 = LoadTexture("assets/powerup.png");
+    Texture2D smallpowerup3 = LoadTexture("assets/powerup.png");
  
     Texture2D spike10 = LoadTexture("assets/spike.png");
     Texture2D spike11 = LoadTexture("assets/spike.png");
