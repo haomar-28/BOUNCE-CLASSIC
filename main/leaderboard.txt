@@ -1,10 +1,10 @@
 not given|65
 turzo|65
 laieh|60
-not given|55
-shfow|55
+adi |60
+lia|60
 hsdf|55
-not given|50
+not given|55
+aditya|55
+shfow|55
 shdo|50
-chapri|45
-ghe|45

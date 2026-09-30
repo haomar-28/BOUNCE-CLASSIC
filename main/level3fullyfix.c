@@ -711,17 +711,13 @@ int destroyerdestroyed = 0;
        if (IsKeyPressed(KEY_M))
 {
     musicmuted = true;
-
-    SetMusicVolume(menumusic, 0.0f);
-    SetMusicVolume(gamemusic, 0.0f);
 }
 
 if (IsKeyPressed(KEY_S))
 {
     musicmuted = false;
 
-    SetMusicVolume(menumusic, 0.2f);
-    SetMusicVolume(gamemusic, 0.2f);
+    
 }
 
  
