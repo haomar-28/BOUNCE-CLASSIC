@@ -207,6 +207,10 @@ float ringsize;
 float ringradius;
 int ringcount;
  
+int frontpressed =0;
+int backpressed =0;
+int jumppressed =0;
+
 Vector2 gemposition;
 Vector2 gemposition1= {17*blocksize, 10* blocksize};
 Vector2 gemposition2;
@@ -1145,6 +1149,15 @@ int main(){
  
     Texture2D startgamebutton =LoadTexture("assets/startgamebutton.png");
     Texture2D startgameglowing =LoadTexture("assets/startgameglowing.png");
+
+    Texture2D back = LoadTexture("assets/back.png");
+    Texture2D backglowing = LoadTexture("assets/backglowing.png");
+    Texture2D front = LoadTexture("assets/front.png");
+    Texture2D frontglowing = LoadTexture("assets/frontglowing.png");
+    Texture2D jump= LoadTexture("assets/jump.png");
+    Texture2D jumpglowing = LoadTexture("assets/jumpglowing.png");
+
+
  
     int levelcount =1;
  
@@ -1218,7 +1231,19 @@ int main(){
     /*  EXPLOSION */
  
     //for generating explosion after collision with enemy1
+
+
     Texture2D explosiontext= LoadTexture("assets/explosion.png");
+
+
+    Vector2 frontpos = {920, 650};
+    Vector2 backpos = {760, 650};
+    Vector2 jumppos = {80, 650};
+
+    Rectangle frontrec = {frontpos.x, frontpos.y, 150,150};
+    Rectangle backrec = {backpos.x, backpos.y, 150,150};
+    Rectangle jumprec = {jumppos.x, jumppos.y, 150,150};
+    
  
     //for explosion effects
     float explosionwidth = (float) explosiontext.width/5;
@@ -1796,14 +1821,14 @@ int main(){
             onplatform = checkcollision(&position, &speed);
  
             //for movement and jumping
-            if (IsKeyDown(KEY_RIGHT))
+            if (IsKeyDown(KEY_RIGHT) || frontpressed==2 )
                 speed.x = maxspeedx;
-            else if (IsKeyDown(KEY_LEFT))
+            else if (IsKeyDown(KEY_LEFT)|| backpressed ==2)
                 speed.x = -maxspeedx;
             else
                 speed.x = 0;
  
-            if (IsKeyPressed(KEY_UP) && (onplatform )){
+            if ((IsKeyPressed(KEY_UP)|| jumppressed ==2) && (onplatform )){
                 speed.y= - jumpspeed;
                 PlaySound(bounce);
                 ballRotation += (speed.x * dt / currentradius) * RAD2DEG;
@@ -3038,6 +3063,37 @@ int main(){
  
         DrawTextureEx(life, lifepos, 0.0f, lifescale, WHITE);
         DrawText(TextFormat("%d", lifecount), 970, 55, 30, MAROON);
+
+        DrawTexturePro(front, (Rectangle){0,0,front.width, front.height}, frontrec,(Vector2){0,0}, 0.0f, WHITE);
+        if(CheckCollisionPointRec(GetMousePosition(), frontrec)){
+            frontpressed=1;
+        DrawTexturePro(frontglowing, (Rectangle){0,0,frontglowing.width, frontglowing.height}, frontrec,(Vector2){0,0}, 0.0f, WHITE);
+            if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                frontpressed =2;
+            }
+        }
+        else frontpressed =0;
+        DrawTexturePro(back, (Rectangle){0,0,back.width, back.height}, backrec,(Vector2){0,0}, 0.0f, WHITE);
+        if(CheckCollisionPointRec(GetMousePosition(), backrec)){
+            backpressed =1;
+        DrawTexturePro(backglowing, (Rectangle){0,0,backglowing.width, backglowing.height}, backrec,(Vector2){0,0}, 0.0f, WHITE);
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                backpressed =2;
+            }
+
+        }
+        else backpressed =0;
+        DrawTexturePro(jump, (Rectangle){0,0,jump.width, jump.height}, jumprec,(Vector2){0,0}, 0.0f, WHITE);
+       if(CheckCollisionPointRec(GetMousePosition(), jumprec)){
+        jumppressed =1;
+        DrawTexturePro(jumpglowing, (Rectangle){0,0,jumpglowing.width, jumpglowing.height}, jumprec,(Vector2){0,0}, 0.0f, WHITE);
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                jumppressed =2;
+            }
+        }
+        else jumppressed = 0;
+
+
  
         // ---------- GAME OVER WINDOW (all levels) ----------
         if(gameover)
