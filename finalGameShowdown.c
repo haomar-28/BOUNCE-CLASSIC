@@ -92,7 +92,7 @@ void savescore(char name[], int score){
 }
  
  
-void drawleaderboard(){
+void drawleaderboard(Texture2D leaderboardbg, Texture2D leaderboardback, Texture2D leaderboardbackglowing,Rectangle leaderboardbackrec, int* leaderboardbackpressed){
     Player players[10];
     int count =0;
  
@@ -105,11 +105,20 @@ void drawleaderboard(){
         fclose(file);
     }
  
-    ClearBackground(LIGHTGRAY);
+    DrawTexturePro(leaderboardbg, (Rectangle){0,0,leaderboardbg.width,leaderboardbg.height}, (Rectangle){0,0, screenwidth, screenheight}, (Vector2){0,0}, 0.0f, WHITE);
+
+    DrawTexturePro(leaderboardback, (Rectangle){0,0,leaderboardback.width,leaderboardback.height}, leaderboardbackrec, (Vector2){0,0}, 0.0f, WHITE);
+    if(CheckCollisionPointRec(GetMousePosition(),leaderboardbackrec)){
+    DrawTexturePro(leaderboardbackglowing, (Rectangle){0,0,leaderboardbackglowing.width,leaderboardbackglowing.height}, leaderboardbackrec, (Vector2){0,0}, 0.0f, WHITE);
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+        *leaderboardbackpressed =1;
+    }
+    else 
+    *leaderboardbackpressed =0;
+    }
  
-    DrawText("LEADERBOARD", 400, 40, 50,DARKBLUE);
  
-    DrawText(TextFormat("SL no. \t\t\tPLAYER \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSCORE"),70,170,30, BLACK);
+    DrawText(TextFormat("SL no. \t\t\tPLAYER \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tSCORE"),70,170,30, SKYBLUE);
  
     DrawRectangle(0,220,screenwidth, 50,MAROON);
     DrawRectangle(0,270,screenwidth, 50,RED);
@@ -117,11 +126,11 @@ void drawleaderboard(){
  
     for(int i=0; i<count; i++){
  
-    DrawText(TextFormat("%d", i+1),90, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+    DrawText(TextFormat("%d", i+1),90, 230+i*50, 30, i < 3 ? RAYWHITE : GREEN);
  
-    DrawText(players[i].name,250, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+    DrawText(players[i].name,250, 230+i*50, 30, i < 3 ? RAYWHITE : GREEN);
  
-    DrawText(TextFormat("%d", players[i].score),800, 230+i*50, 30, i < 3 ? RAYWHITE : BLACK);
+    DrawText(TextFormat("%d", players[i].score),800, 230+i*50, 30, i < 3 ? RAYWHITE : GREEN);
 }
 }
  
@@ -1110,11 +1119,25 @@ int main(){
     Texture2D leaderboardbutton = LoadTexture("assets/leaderboardbutton.png");
     Texture2D leaderboardglowing = LoadTexture("assets/leaderboardglowing.png");
 
+    Texture2D startgameback = LoadTexture("assets/backstartgame.png");
+    Texture2D startgamebackglowing = LoadTexture("assets/backstartgameglowing.png");
+    Texture2D leaderboardback = LoadTexture("assets/leaderboardback.png");
+    Texture2D leaderboardbackglowing = LoadTexture("assets/leaderboardbackglowing.png");
+    Texture2D startgamebg = LoadTexture("assets/startgamebg.png");
+
+    Texture2D leaderboardbg = LoadTexture("assets/leaderboardbg.png");
+
     Texture2D gamebg = LoadTexture("assets/gamebg.png");
+
+    Texture2D creditbg = LoadTexture("assets/creditbg.png");
  
     Texture2D credit = LoadTexture("assets/credit.png");
  
     Texture2D rulesbg = LoadTexture("assets/rulesbg.png");
+
+    Texture2D creditback = LoadTexture("assets/creditback.png");
+    Texture2D creditbackglowing= LoadTexture("assets/creditbackglowing.png");
+
  
     Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
  
@@ -1354,6 +1377,8 @@ int main(){
     Rectangle enemy10rect3 = {enemy10position3.x, enemy10position3.y, enemy10size3, enemy10size3};
     Rectangle enemy11rect3 = {enemy11position3.x, enemy11position3.y, enemy11size3, enemy11size3};
  
+
+    // 
     /*MUSIC*/
  
     Music menumusic = LoadMusicStream("assets/menumusic.mp3");
@@ -1383,10 +1408,21 @@ int main(){
     Rectangle ring4top3 = {ring4frontposition3.x - 1.8f, ring4frontposition3.y - ring4radius3 - 6, 7, 6};
     Rectangle ring4bottom3 = {ring4frontposition3.x - 1.8f, ring4frontposition3.y + ring4radius3, 7, 6};
  
+
+        Vector2 startgamebackpos= {390, 650};
+        Rectangle startgamebackrec = {startgamebackpos.x,startgamebackpos.y, 320, 120 };
+
+        Vector2 creditbackpos= {840, 720};
+        Rectangle creditbackrec = {creditbackpos.x,creditbackpos.y, 150, 80 };
+
+        Vector2 leaderboardbackpos= {420, 730};
+        Rectangle leaderboardbackrec = {leaderboardbackpos.x,leaderboardbackpos.y, 220, 90 };
+
     float timer =0;
  
     Sound powerupsound = LoadSound("assets/powerup.mp3");
     Sound gamecomplete = LoadSound("assets/gamecomplete.mp3");
+
  
     menumusic.looping = true;
     gamemusic.looping = true;
@@ -1455,7 +1491,7 @@ int main(){
         Rectangle leaderboardrec = {420, 500, leaderboardbutton.width, leaderboardbutton.height};
         Rectangle rulesbackrec = {385, 670, 300,88};
  
-        Rectangle startgamerec = {390, 700, startgamebutton.width/3, startgamebutton.height/3};
+        Rectangle startgamerec = {390, 550, startgamebutton.width/3, startgamebutton.height/3};
         Rectangle creditrec = {900,90, credit.width/3, credit.height/3};
  
         int rulesbackpressed= 0;
@@ -1565,7 +1601,7 @@ int main(){
         BeginDrawing();
  
         if(play==2 && entername ==1){
-            ClearBackground(SKYBLUE);
+            DrawTexturePro(startgamebg, (Rectangle){0,0, startgamebg.width ,startgamebg.height }, (Rectangle){0,0,screenwidth, screenheight}, (Vector2){0,0}, 0.0f, WHITE);
             DrawText("ENTER YOUR NAME", 350, 200, 40, MAROON);
             DrawRectangle(300,300, 480, 70, LIGHTGRAY);
             DrawRectangleLines(300,300, 480, 70, BLACK);
@@ -1573,18 +1609,14 @@ int main(){
             DrawText(name, 320, 320 ,30, BLACK);
  
             DrawTexturePro(startgamebutton, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
-            DrawText("PRESS 'left arrow key' TO GO BACK", 200, 400, 40, BLUE );
+
+
+            DrawTexturePro(startgameback, (Rectangle){0,0, startgameback.width, startgameback.height}, startgamebackrec, (Vector2){0,0}, 0.0f, WHITE);
  
-            if(IsKeyPressed(KEY_LEFT)){
-                menu=1;
-                startgame=0;
-                play=0;
-                leaderboard=0;
-                rules=0;
-            }
  
             if(CheckCollisionPointRec(mousepos, startgamerec)){
                 DrawTexturePro(startgameglowing, (Rectangle){0,0, startgamebutton.width, startgamebutton.height}, startgamerec, (Vector2){0,0}, 0.0f, WHITE);
+
                 if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                     PlaySound(buttonsound);
                     gameover = 0;
@@ -1622,6 +1654,20 @@ int main(){
                     entername =0;
                 }
             }
+
+            if(CheckCollisionPointRec(mousepos, startgamebackrec)){
+                DrawTexturePro(startgamebackglowing, (Rectangle){0,0, startgamebackglowing.width, startgamebackglowing.height}, startgamebackrec, (Vector2){0,0}, 0.0f, WHITE);
+
+                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                    PlaySound(buttonsound);
+                    menu=1;
+                startgame=0;
+                play=0;
+                leaderboard=0;
+                rules=0;
+                    entername =0;
+                }
+            }
  
         }
  
@@ -1634,27 +1680,41 @@ int main(){
         }
  
         else if(leaderboard==2){
-            drawleaderboard();
- 
-            DrawText("PRESS 'B' TO GO BACK",500, 760, 40, PURPLE);
-            if(IsKeyPressed(KEY_B)){
-                leaderboard=0;
-                menu =1;
+            int leaderboardbackpressed =0;
+            drawleaderboard(leaderboardbg,leaderboardback, leaderboardbackglowing, leaderboardbackrec,&leaderboardbackpressed);
+            if(leaderboardbackpressed ==1){
+                PlaySound(buttonsound);
+                leaderboard =0;
+                menu = 1;
             }
+ 
+            
         }
  
         else if(creditnum==2){
-            DrawRectangle(0,0, screenwidth, screenheight,BLACK);
-            DrawText("CREDITS", 450, 60, 60, RED);
+            DrawTexturePro(creditbg, (Rectangle){0,0,creditbg.width,creditbg.height}, (Rectangle){0,0,screenwidth,screenheight },(Vector2){0, 0}, 0.0f, WHITE);
+
             DrawTexturePro(omar, (Rectangle){0,0,omar.width,omar.height}, (Rectangle){150,150, 300, 500 },(Vector2){0, 0}, 0.0f, WHITE);
             DrawTexturePro(turzo, (Rectangle){0,0,turzo.width,turzo.height}, (Rectangle){650,150, 300, 500 },(Vector2){0, 0}, 0.0f, WHITE);
+
+            DrawTexturePro(creditback, (Rectangle){0,0,creditback.width,creditback.height}, creditbackrec,(Vector2){0, 0}, 0.0f, WHITE);
+
+            if(CheckCollisionPointRec(mousepos, creditbackrec)){
+                DrawTexturePro(creditbackglowing, (Rectangle){0,0,creditbackglowing.width,creditbackglowing.height}, creditbackrec,(Vector2){0, 0}, 0.0f, WHITE);
+                if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                    PlaySound(buttonsound);
+                    creditnum=0;
+                    menu=1;
+                }
+            }
+
  
             DrawText("HOSSAIN AL OMAR", 120, 650, 40, BLUE);
             DrawText("2505138", 170, 710, 40, BLUE);
             DrawText("TURZO ADITYA MONDAL", 570, 650, 35, BLUE);
-            DrawText("2505150", 620, 710, 40, BLUE);
+            DrawText("2505150", 650, 710, 40, BLUE);
  
-            DrawText("PRESS 'LEFT ARROW KEY' TO GO BACK", 200, 780, 30, PURPLE);
+            
  
             if(IsKeyPressed(KEY_LEFT)){
                 menu=1;
