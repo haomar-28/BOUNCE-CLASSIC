@@ -1138,6 +1138,8 @@ int main(){
     Texture2D creditback = LoadTexture("assets/creditback.png");
     Texture2D creditbackglowing= LoadTexture("assets/creditbackglowing.png");
 
+    Texture2D creditimagebg = LoadTexture("assets/creditimagebg.png");
+
  
     Texture2D rulesbackglowing = LoadTexture("assets/rulesbackglowing.png");
  
@@ -1418,6 +1420,10 @@ int main(){
         Vector2 leaderboardbackpos= {420, 730};
         Rectangle leaderboardbackrec = {leaderboardbackpos.x,leaderboardbackpos.y, 220, 90 };
 
+        Vector2 creditimagepos1 = {100,110};
+        Vector2 creditimagepos2= {580,110};
+        Rectangle creditimagerec1 = {creditimagepos1.x, creditimagepos1.y, 420, 620};
+        Rectangle creditimagerec2 = {creditimagepos2.x, creditimagepos2.y, 420, 620};
     float timer =0;
  
     Sound powerupsound = LoadSound("assets/powerup.mp3");
@@ -1692,10 +1698,16 @@ int main(){
         }
  
         else if(creditnum==2){
+
             DrawTexturePro(creditbg, (Rectangle){0,0,creditbg.width,creditbg.height}, (Rectangle){0,0,screenwidth,screenheight },(Vector2){0, 0}, 0.0f, WHITE);
 
-            DrawTexturePro(omar, (Rectangle){0,0,omar.width,omar.height}, (Rectangle){150,150, 300, 500 },(Vector2){0, 0}, 0.0f, WHITE);
-            DrawTexturePro(turzo, (Rectangle){0,0,turzo.width,turzo.height}, (Rectangle){650,150, 300, 500 },(Vector2){0, 0}, 0.0f, WHITE);
+            DrawTexturePro(creditimagebg, (Rectangle){0,0,creditimagebg.width,creditimagebg.height}, creditimagerec1,(Vector2){0, 0}, 0.0f, WHITE);
+            DrawTexturePro(creditimagebg, (Rectangle){0,0,creditimagebg.width,creditimagebg.height}, creditimagerec2,(Vector2){0, 0}, 0.0f, WHITE);
+            
+
+
+            DrawTexturePro(omar, (Rectangle){0,0,omar.width,omar.height}, (Rectangle){170,180, 270, 400 },(Vector2){0, 0}, 0.0f, WHITE);
+            DrawTexturePro(turzo, (Rectangle){0,0,turzo.width,turzo.height}, (Rectangle){650,180, 270, 400 },(Vector2){0, 0}, 0.0f, WHITE);
 
             DrawTexturePro(creditback, (Rectangle){0,0,creditback.width,creditback.height}, creditbackrec,(Vector2){0, 0}, 0.0f, WHITE);
 
@@ -1709,10 +1721,10 @@ int main(){
             }
 
  
-            DrawText("HOSSAIN AL OMAR", 120, 650, 40, BLUE);
-            DrawText("2505138", 170, 710, 40, BLUE);
-            DrawText("TURZO ADITYA MONDAL", 570, 650, 35, BLUE);
-            DrawText("2505150", 650, 710, 40, BLUE);
+            DrawText("HOSSAIN AL OMAR", 190, 600, 25, BLUE);
+            DrawText("2505138", 260, 640, 20, BLUE);
+            DrawText("TURZO ADITYA MONDAL", 640, 600, 25, BLUE);
+            DrawText("2505150", 740, 640, 20, BLUE);
  
             
  

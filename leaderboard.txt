@@ -1,7 +1,8 @@
+oamr|50
 lia|20
+hdosfhs|15
 df|5
-not given|0
-not given|0
+oamr|5
 not given|0
 not given|0
 not given|0
